@@ -5,6 +5,9 @@ This explains how I do bulk Koji operations in Fedora.
 Note that this is not ready to use tool with nice command line API, this is
 merely an example.
 
+**Note:** Make sure your `/usr/bin/parallel` comes from `moreutils-parallel`
+package (not just `parallel`), or the following example won't work.
+
 Take the `fedpkg-build.sh` script and edit it to suite your needs. And then
 invoke it in parallel:
 
