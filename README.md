@@ -13,7 +13,7 @@ invoke it in parallel:
 
 ```console
 $ cd empty_directory
-$ parallel -j 12 bash fedpkg-build.sh -- $(cat ../packages.txt)
+$ parallel -j 12 bash ../fedpkg-build.sh -- $(cat ../packages.txt)
 ```
 
 It takes packages as positional arguments, here provided via `cat`. You can
