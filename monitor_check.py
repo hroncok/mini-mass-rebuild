@@ -31,7 +31,7 @@ def _bugzillas():
     bzapi = bugzilla.Bugzilla(BUGZILLA)
     query = bzapi.build_query(product='Fedora')
     query['blocks'] = TRACKER
-    return bzapi.query(query)
+    return sorted(bzapi.query(query), key=lambda b: -b.id)
 
 
 async def bugzillas():
