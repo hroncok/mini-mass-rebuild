@@ -3,8 +3,10 @@ import asyncio
 import bugzilla
 import concurrent.futures
 import re
+import sys
 
 from click import secho
+from collections import Counter
 
 
 MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.8/monitor/'
@@ -16,6 +18,13 @@ TAG = 'f31'
 LIMIT = 1000
 BUGZILLA = 'bugzilla.redhat.com'
 TRACKER = 1686977  # PYTHON38
+
+EXPLANATION = {
+    'red': 'probably FTBFS',
+    'blue': 'probably blocked',
+    'yellow': 'reported',
+    'green': 'retired',
+}
 
 
 def _bugzillas():
@@ -61,6 +70,15 @@ def bug(bugs, package):
     return None
 
 
+counter = Counter()
+
+
+def p(*args, **kwargs):
+    if 'fg' in kwargs:
+        counter[kwargs['fg']] += 1
+    secho(*args, **kwargs)
+
+
 async def process(session, bugs, package, build, status):
     if status != 'failed':
         return
@@ -72,20 +90,20 @@ async def process(session, bugs, package, build, status):
     retired = await is_retired(package)
 
     if retired:
-        secho(f'{package} is retired', fg='green')
+        p(f'{package} is retired', fg='green')
         return
 
     bz = bug(bugs, package)
     if bz and bz.status != "CLOSED":
-        secho(f'{package} failed len={content_length} bz{bz.id} {bz.status}',
-              fg='yellow')
+        p(f'{package} failed len={content_length} bz{bz.id} {bz.status}',
+          fg='yellow')
         return
 
     fg = 'red' if content_length > LIMIT else 'blue'
     if not bz:
-        secho(f'{package} failed len={content_length}', fg=fg)
+        p(f'{package} failed len={content_length}', fg=fg)
     else:
-        secho(f'{package} failed len={content_length} bz{bz.id} CLOSED', fg=fg)
+        p(f'{package} failed len={content_length} bz{bz.id} CLOSED', fg=fg)
 
 
 async def main():
@@ -126,5 +144,10 @@ async def main():
                 break
 
         await asyncio.gather(*jobs)
+
+        p(file=sys.stderr)
+        for fg, count in counter.most_common():
+            p(f'There are {count} {fg} lines ({EXPLANATION[fg]})',
+              file=sys.stderr, fg=fg)
 
 asyncio.run(main())
