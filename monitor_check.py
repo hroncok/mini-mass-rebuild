@@ -11,6 +11,7 @@ from collections import Counter
 
 MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.8/monitor/'
 BUILDLOG = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.8/fedora-rawhide-x86_64/{build:08d}-{package}/build.log.gz'
+PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=master&global_component={package}'
 PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.8/package/([^/]+)/">')
 BUILD = re.compile(r'<a href="/coprs/g/python/python3.8/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
@@ -40,9 +41,15 @@ async def bugzillas():
         return await loop.run_in_executor(pool, _bugzillas)
 
 
-async def fetch(session, url):
-    async with session.get(url) as response:
-        return await response.text()
+async def fetch(session, url, *, json=False):
+    try:
+        async with session.get(url) as response:
+            if json:
+                return await response.json()
+            return await response.text()
+    except aiohttp.client_exceptions.ServerDisconnectedError:
+        await asyncio.sleep(1)
+        return await fetch(session, url, json=json)
 
 
 async def length(session, url):
@@ -61,6 +68,15 @@ async def is_retired(package):
                                                 stdout=asyncio.subprocess.PIPE)
     stdout, _ = await proc.communicate()
     return b'[BLOCKED]' in stdout
+
+
+async def is_critpath(session, package):
+    json = await fetch(session, PDC.format(package=package), json=True)
+    for result in json['results']:
+        if result['type'] == 'rpm':
+            return result['critical_path']
+    else:
+        assert False
 
 
 def bug(bugs, package):
@@ -84,7 +100,12 @@ async def process(session, bugs, package, build, status):
         return
 
     # by querying this all the time, we slow down the koji command
-    content_length = await length(session, buildlog_link(package, build))
+    content_length, critpath = await asyncio.gather(
+        length(session, buildlog_link(package, build)),
+        is_critpath(session, package),
+    )
+
+    end = ' \N{FIRE}' if critpath else ''
 
     # this should be semaphored really, but the above prevents fuckups
     retired = await is_retired(package)
@@ -95,15 +116,16 @@ async def process(session, bugs, package, build, status):
 
     bz = bug(bugs, package)
     if bz and bz.status != "CLOSED":
-        p(f'{package} failed len={content_length} bz{bz.id} {bz.status}',
+        p(f'{package} failed len={content_length} bz{bz.id} {bz.status}{end}',
           fg='yellow')
         return
 
     fg = 'red' if content_length > LIMIT else 'blue'
     if not bz:
-        p(f'{package} failed len={content_length}', fg=fg)
+        p(f'{package} failed len={content_length}{end}', fg=fg)
     else:
-        p(f'{package} failed len={content_length} bz{bz.id} CLOSED', fg=fg)
+        p(f'{package} failed len={content_length} bz{bz.id} CLOSED{end}',
+          fg=fg)
 
 
 async def main():
@@ -149,5 +171,6 @@ async def main():
         for fg, count in counter.most_common():
             p(f'There are {count} {fg} lines ({EXPLANATION[fg]})',
               file=sys.stderr, fg=fg)
+
 
 asyncio.run(main())
