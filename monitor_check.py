@@ -105,8 +105,6 @@ async def process(session, bugs, package, build, status):
         is_critpath(session, package),
     )
 
-    end = ' \N{FIRE}' if critpath else ''
-
     # this should be semaphored really, but the above prevents fuckups
     retired = await is_retired(package)
 
@@ -114,18 +112,19 @@ async def process(session, bugs, package, build, status):
         p(f'{package} is retired', fg='green')
         return
 
-    bz = bug(bugs, package)
-    if bz and bz.status != "CLOSED":
-        p(f'{package} failed len={content_length} bz{bz.id} {bz.status}{end}',
-          fg='yellow')
-        return
+    message = f'{package} failed len={content_length}'
 
-    fg = 'red' if content_length > LIMIT else 'blue'
-    if not bz:
-        p(f'{package} failed len={content_length}{end}', fg=fg)
-    else:
-        p(f'{package} failed len={content_length} bz{bz.id} CLOSED{end}',
-          fg=fg)
+    bz = bug(bugs, package)
+    if bz:
+        message += f' bz{bz.id} {bz.status}'
+        fg = 'yellow'
+
+    if not bz or bz.status == "CLOSED":
+        fg = 'red' if content_length > LIMIT else 'blue'
+
+    if critpath:
+        message += ' \N{FIRE}'
+    p(message, fg=fg)
 
 
 async def main():
