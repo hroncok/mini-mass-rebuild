@@ -15,7 +15,8 @@ cmd = 'copr get-package @python/python3.8 --with-all-builds --name'.split()
 pkg_detail = json.loads(subprocess.check_output(cmd + [pkg], text=True))
 
 succeeded = [build for build in pkg_detail['builds']
-             if build['state'] == 'succeeded']
+             if build['state'] == 'succeeded'
+             and build['project_dirname'] == 'python3.8']
 
 versions = dict((build['id'], drop_release(build['source_package']['version']))
                 for build in succeeded)
