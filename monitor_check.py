@@ -76,7 +76,8 @@ async def is_critpath(session, package):
         if result['type'] == 'rpm':
             return result['critical_path']
     else:
-        assert False
+        print(f'Could not check if {package} is \N{FIRE}', file=sys.stderr)
+        return False
 
 
 def bug(bugs, package):
