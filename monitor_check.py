@@ -164,13 +164,18 @@ async def main():
 
             if 'Possible build states:' in line:
                 break
+        try:
+            await asyncio.gather(*jobs)
+        finally:
+            cancels = (t.cancel() for t in asyncio.all_tasks()
+                       if t is not asyncio.current_task())
+            await asyncio.gather(*cancels)
 
-        await asyncio.gather(*jobs)
 
-        p(file=sys.stderr)
-        for fg, count in counter.most_common():
-            p(f'There are {count} {fg} lines ({EXPLANATION[fg]})',
-              file=sys.stderr, fg=fg)
+    p(file=sys.stderr)
+    for fg, count in counter.most_common():
+        p(f'There are {count} {fg} lines ({EXPLANATION[fg]})',
+          file=sys.stderr, fg=fg)
 
 
 asyncio.run(main())
