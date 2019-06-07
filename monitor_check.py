@@ -29,6 +29,21 @@ EXPLANATION = {
     'blue': 'probably blocked',
     'yellow': 'reported',
     'green': 'retired',
+    'cyan': 'excluded from bug filing',
+}
+
+# FTBS packages for which we don't open bugs (yet)
+EXCLUDE = {
+    'brltty': 'filed in alsa',
+    'libtevent': 'filed in samba',
+    'libtalloc': 'filed in samba',
+    'libldb': 'filed in samba',
+    'python-parallel-ssh': 'filed elsewhere (???)',
+    'python-bashate': 'filed in python-oslo-sphinx, bz 1705932',
+    'pysvn': 'filed in python-pycxx, bz 1718318',
+    'python-sanic': 'filed in python-uvloop, bz 1718390',
+    'gnucash': 'declaration-after-statement',
+    'onboard': 'declaration-after-statement',
 }
 
 
@@ -119,19 +134,29 @@ async def process(session, bugs, package, build, status, *, browser_lock=None):
 
     message = f'{package} failed len={content_length}'
 
-    bz = bug(bugs, package)
-    if bz:
-        message += f' bz{bz.id} {bz.status}'
-        fg = 'yellow'
+    if package in EXCLUDE:
+        bz = None
+        fg = 'cyan'
+        message += f'(excluded: {EXCLUDE[package]})'
+    else:
+        bz = bug(bugs, package)
+        if bz:
+            message += f' bz{bz.id} {bz.status}'
+            fg = 'yellow'
 
-    if not bz or bz.status == "CLOSED":
-        fg = 'red' if content_length > LIMIT else 'blue'
+        if not bz or bz.status == "CLOSED":
+            fg = 'red' if content_length > LIMIT else 'blue'
 
     if critpath:
         message += ' \N{FIRE}'
     p(message, fg=fg)
 
-    if browser_lock and not bz and content_length > LIMIT:
+    if (
+        browser_lock
+        and (not bz or bz.status == "CLOSED")
+        and (content_length > LIMIT)
+        and (str(package) not in EXCLUDE)
+    ):
         await open_bz(package, build, status, browser_lock)
 
 
