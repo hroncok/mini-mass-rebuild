@@ -39,9 +39,8 @@ def _bugzillas():
 
 
 async def bugzillas():
-    loop = asyncio.get_event_loop()
-    with concurrent.futures.ThreadPoolExecutor() as pool:
-        return await loop.run_in_executor(pool, _bugzillas)
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, _bugzillas)
 
 
 async def fetch(session, url, *, json=False):
