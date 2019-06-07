@@ -2,6 +2,7 @@ import aiohttp
 import asyncio
 import bugzilla
 import concurrent.futures
+import logging
 import re
 import sys
 
@@ -27,6 +28,8 @@ EXPLANATION = {
     'green': 'retired',
 }
 
+logger = logging.getLogger('monitor_check')
+
 
 def _bugzillas():
     bzapi = bugzilla.Bugzilla(BUGZILLA)
@@ -42,6 +45,7 @@ async def bugzillas():
 
 
 async def fetch(session, url, *, json=False):
+    logger.debug('fetch %s', url)
     try:
         async with session.get(url) as response:
             if json:
@@ -53,6 +57,7 @@ async def fetch(session, url, *, json=False):
 
 
 async def length(session, url):
+    logger.debug('length %s', url)
     async with session.head(url) as response:
         return int(response.headers.get('content-length'))
 
@@ -129,6 +134,11 @@ async def process(session, bugs, package, build, status):
 
 
 async def main():
+    logging.basicConfig(
+        format='%(asctime)s %(name)s %(levelname)s: %(message)s',
+        level=logging.DEBUG)
+    logging.getLogger('bugzilla.bug').setLevel(logging.INFO)
+
     jobs = []
 
     async with aiohttp.ClientSession() as session:
