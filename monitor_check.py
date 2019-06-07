@@ -65,11 +65,18 @@ def buildlog_link(package, build):
     return BUILDLOG.format(package=package, build=build)
 
 
+class KojiError (Exception):
+    pass
+
+
 async def is_retired(package):
     cmd = ('koji', 'list-pkgs', '--show-blocked',
            '--tag', TAG, '--package', package)
-    proc = await asyncio.create_subprocess_exec(*cmd,
-                                                stdout=asyncio.subprocess.PIPE)
+    try:
+        proc = await asyncio.create_subprocess_exec(*cmd,
+                                                    stdout=asyncio.subprocess.PIPE)
+    except Exception as e:
+        raise KojiError(f'Failed to run koji: {e!r}') from None
     stdout, _ = await proc.communicate()
     return b'[BLOCKED]' in stdout
 
@@ -174,7 +181,19 @@ async def main():
             if 'Possible build states:' in line:
                 break
 
-        await asyncio.gather(*jobs)
+        try:
+            try:
+                await asyncio.gather(*jobs)
+            except KojiError as e:
+                sys.exit(str(e))
+        finally:
+            for t in jobs:
+                t.cancel()
+            for t in jobs:
+                try:
+                    await t
+                except:
+                    pass
 
         p(file=sys.stderr)
         for fg, count in counter.most_common():
