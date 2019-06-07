@@ -4,7 +4,11 @@ import bugzilla
 import concurrent.futures
 import re
 import sys
+from urllib.parse import urlencode
+from textwrap import dedent
+import webbrowser
 
+import click
 from click import secho
 from collections import Counter
 
@@ -96,7 +100,7 @@ def p(*args, **kwargs):
     secho(*args, **kwargs)
 
 
-async def process(session, bugs, package, build, status):
+async def process(session, bugs, package, build, status, *, browser_lock=None):
     if status != 'failed':
         return
 
@@ -127,8 +131,49 @@ async def process(session, bugs, package, build, status):
         message += ' \N{FIRE}'
     p(message, fg=fg)
 
+    if browser_lock and not bz and content_length > LIMIT:
+        await open_bz(package, build, status, browser_lock)
 
-async def main():
+
+async def open_bz(package, build, status, browser_lock):
+    summary = f"{package} fails to build with Python 3.8"
+
+    description = dedent(f"""
+        {package} fails to build with Python 3.8.0b1.
+
+        This report is automated and not very verbose, but we'll try to get back here with details.
+
+        For the build logs, see:
+        https://copr-be.cloud.fedoraproject.org/results/@python/python3.8/fedora-rawhide-x86_64/{build:08}-{package}/
+
+        For all our attempts to build {package} with Python 3.8, see:
+        https://copr.fedorainfracloud.org/coprs/g/python/python3.8/package/{package}/
+    """)
+
+    url_prefix = 'https://bugzilla.redhat.com/enter_bug.cgi?'
+    params = {
+        'short_desc': summary,
+        'comment': description,
+        'component': str(package),
+        'dependson': 'PYTHON38',
+        'product': 'Fedora',
+        'version': 'rawhide',
+    }
+
+    # Rate-limit opening browser tabs
+    async with browser_lock:
+        await asyncio.sleep(1)
+        webbrowser.open(url_prefix + urlencode(params))
+
+
+async def main(open_bug_reports=False):
+
+    # A lock to rate-limit opening browser tabs. If None, tabs aren't opened.
+    if open_bug_reports:
+        browser_lock = asyncio.Lock()
+    else:
+        browser_lock = None
+
     jobs = []
 
     async with aiohttp.ClientSession() as session:
@@ -160,7 +205,8 @@ async def main():
                 status = hit.group(1)
                 jobs.append(
                     asyncio.ensure_future(
-                        process(session, bugs, package, build, status)))
+                        process(session, bugs, package, build, status,
+                                browser_lock=browser_lock)))
 
             if 'Possible build states:' in line:
                 break
@@ -173,4 +219,14 @@ async def main():
               file=sys.stderr, fg=fg)
 
 
-asyncio.run(main())
+@click.command()
+@click.option(
+    '--open-bug-reports/--no-open-bug-reports',
+    help='Open a browser page (!) with a bug report template for each '
+        + 'package that seems to need a bug report'
+)
+def run(open_bug_reports):
+    asyncio.run(main(open_bug_reports))
+
+if __name__ == '__main__':
+    run()
