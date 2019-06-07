@@ -148,6 +148,11 @@ async def open_bz(package, build, status, browser_lock):
 
         For all our attempts to build {package} with Python 3.8, see:
         https://copr.fedorainfracloud.org/coprs/g/python/python3.8/package/{package}/
+
+        Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if your package builds with Python 3.8:
+        https://copr.fedorainfracloud.org/coprs/g/python/python3.8/
+
+        Let us know here if you have any questions.
     """)
 
     url_prefix = 'https://bugzilla.redhat.com/enter_bug.cgi?'
@@ -158,12 +163,13 @@ async def open_bz(package, build, status, browser_lock):
         'dependson': 'PYTHON38',
         'product': 'Fedora',
         'version': 'rawhide',
+        'bug_severity': 'high',
     }
 
     # Rate-limit opening browser tabs
     async with browser_lock:
-        await asyncio.sleep(1)
         webbrowser.open(url_prefix + urlencode(params))
+        await asyncio.sleep(1)
 
 
 async def main(open_bug_reports=False):
