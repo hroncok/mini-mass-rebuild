@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 import bugzilla
-import concurrent.futures
+import logging
 import re
 import sys
 from urllib.parse import urlencode
@@ -23,6 +23,7 @@ TAG = 'f31'
 LIMIT = 1000
 BUGZILLA = 'bugzilla.redhat.com'
 TRACKER = 1686977  # PYTHON38
+LOGLEVEL = logging.WARNING
 
 EXPLANATION = {
     'red': 'probably FTBFS',
@@ -46,6 +47,8 @@ EXCLUDE = {
     'onboard': 'declaration-after-statement',
 }
 
+logger = logging.getLogger('monitor_check')
+
 
 def _bugzillas():
     bzapi = bugzilla.Bugzilla(BUGZILLA)
@@ -55,42 +58,53 @@ def _bugzillas():
 
 
 async def bugzillas():
-    loop = asyncio.get_event_loop()
-    with concurrent.futures.ThreadPoolExecutor() as pool:
-        return await loop.run_in_executor(pool, _bugzillas)
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, _bugzillas)
 
 
-async def fetch(session, url, *, json=False):
-    try:
-        async with session.get(url) as response:
-            if json:
-                return await response.json()
-            return await response.text()
-    except aiohttp.client_exceptions.ServerDisconnectedError:
-        await asyncio.sleep(1)
-        return await fetch(session, url, json=json)
+async def fetch(session, url, http_semaphore, *, json=False):
+    async with http_semaphore:
+        logger.debug('fetch %s', url)
+        try:
+            async with session.get(url) as response:
+                if json:
+                    return await response.json()
+                return await response.text()
+        except aiohttp.client_exceptions.ServerDisconnectedError:
+            await asyncio.sleep(1)
+            return await fetch(session, url, http_semaphore, json=json)
 
 
-async def length(session, url):
-    async with session.head(url) as response:
-        return int(response.headers.get('content-length'))
+async def length(session, url, http_semaphore):
+    async with http_semaphore:
+        logger.debug('length %s', url)
+        async with session.head(url) as response:
+            return int(response.headers.get('content-length'))
 
 
 def buildlog_link(package, build):
     return BUILDLOG.format(package=package, build=build)
 
 
-async def is_retired(package):
+class KojiError (Exception):
+    pass
+
+
+async def is_retired(package, command_semaphore):
     cmd = ('koji', 'list-pkgs', '--show-blocked',
            '--tag', TAG, '--package', package)
-    proc = await asyncio.create_subprocess_exec(*cmd,
-                                                stdout=asyncio.subprocess.PIPE)
-    stdout, _ = await proc.communicate()
-    return b'[BLOCKED]' in stdout
+    async with command_semaphore:
+        try:
+            proc = await asyncio.create_subprocess_exec(*cmd,
+                                                        stdout=asyncio.subprocess.PIPE)
+        except Exception as e:
+            raise KojiError(f'Failed to run koji: {e!r}') from None
+        stdout, _ = await proc.communicate()
+        return b'[BLOCKED]' in stdout
 
 
-async def is_critpath(session, package):
-    json = await fetch(session, PDC.format(package=package), json=True)
+async def is_critpath(session, package, http_semaphore):
+    json = await fetch(session, PDC.format(package=package), http_semaphore, json=True)
     for result in json['results']:
         if result['type'] == 'rpm':
             return result['critical_path']
@@ -115,22 +129,23 @@ def p(*args, **kwargs):
     secho(*args, **kwargs)
 
 
-async def process(session, bugs, package, build, status, *, browser_lock=None):
+async def process(
+    session, bugs, package, build, status, http_semaphore, command_semaphore,
+    *, browser_lock=None
+):
     if status != 'failed':
         return
 
-    # by querying this all the time, we slow down the koji command
-    content_length, critpath = await asyncio.gather(
-        length(session, buildlog_link(package, build)),
-        is_critpath(session, package),
-    )
-
-    # this should be semaphored really, but the above prevents fuckups
-    retired = await is_retired(package)
+    retired = await is_retired(package, command_semaphore)
 
     if retired:
         p(f'{package} is retired', fg='green')
         return
+
+    content_length, critpath = await gather_or_cancel(
+        length(session, buildlog_link(package, build), http_semaphore),
+        is_critpath(session, package, http_semaphore),
+    )
 
     message = f'{package} failed len={content_length}'
 
@@ -197,7 +212,27 @@ async def open_bz(package, build, status, browser_lock):
         await asyncio.sleep(1)
 
 
+async def gather_or_cancel(*tasks):
+    '''
+    Like asyncio.gather, but if one task fails, others are cancelled
+    '''
+    tasks = [t if asyncio.isfuture(t) else asyncio.create_task(t) for t in tasks]
+    try:
+        return await asyncio.gather(*tasks)
+    finally:
+        for t in tasks:
+            if not t.done():
+                t.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+
 async def main(open_bug_reports=False):
+    logging.basicConfig(
+        format='%(asctime)s %(name)s %(levelname)s: %(message)s',
+        level=LOGLEVEL)
+
+    http_semaphore = asyncio.Semaphore(20)
+    command_semaphore = asyncio.Semaphore(10)
 
     # A lock to rate-limit opening browser tabs. If None, tabs aren't opened.
     if open_bug_reports:
@@ -205,16 +240,15 @@ async def main(open_bug_reports=False):
     else:
         browser_lock = None
 
-    jobs = []
-
     async with aiohttp.ClientSession() as session:
         # we could stream the content, but meh, get it all, it's not that long
-        monitor = fetch(session, MONITOR)
+        monitor = fetch(session, MONITOR, http_semaphore)
         bugs = bugzillas()
         monitor, bugs = await asyncio.gather(monitor, bugs)
 
         package = build = status = None
         lasthit = 'status'
+        jobs = []
 
         for line in monitor.splitlines():
             hit = PACKAGE.search(line)
@@ -234,15 +268,19 @@ async def main(open_bug_reports=False):
                 assert lasthit == 'build'
                 lasthit = 'status'
                 status = hit.group(1)
-                jobs.append(
-                    asyncio.ensure_future(
-                        process(session, bugs, package, build, status,
-                                browser_lock=browser_lock)))
+                jobs.append(asyncio.ensure_future(process(
+                    session, bugs, package, build, status,
+                    http_semaphore, command_semaphore,
+                    browser_lock=browser_lock
+                )))
 
             if 'Possible build states:' in line:
                 break
 
-        await asyncio.gather(*jobs)
+        try:
+            await gather_or_cancel(*jobs)
+        except KojiError as e:
+            sys.exit(str(e))
 
         p(file=sys.stderr)
         for fg, count in counter.most_common():
