@@ -152,7 +152,7 @@ async def process(
     if package in EXCLUDE:
         bz = None
         fg = 'cyan'
-        message += f'(excluded: {EXCLUDE[package]})'
+        message += f' (excluded: {EXCLUDE[package]})'
     else:
         bz = bug(bugs, package)
         if bz:
