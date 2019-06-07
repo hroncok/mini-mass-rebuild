@@ -1,7 +1,6 @@
 import aiohttp
 import asyncio
 import bugzilla
-import concurrent.futures
 import logging
 import re
 import sys
