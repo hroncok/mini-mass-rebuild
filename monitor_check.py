@@ -114,18 +114,16 @@ async def process(session, bugs, package, build, status, http_semaphore, command
     if status != 'failed':
         return
 
-    # by querying this all the time, we slow down the koji command
-    content_length, critpath = await gather_or_cancel(
-        length(session, buildlog_link(package, build), http_semaphore),
-        is_critpath(session, package, http_semaphore),
-    )
-
-    # this should be semaphored really, but the above prevents fuckups
     retired = await is_retired(package, command_semaphore)
 
     if retired:
         p(f'{package} is retired', fg='green')
         return
+
+    content_length, critpath = await gather_or_cancel(
+        length(session, buildlog_link(package, build), http_semaphore),
+        is_critpath(session, package, http_semaphore),
+    )
 
     message = f'{package} failed len={content_length}'
 
