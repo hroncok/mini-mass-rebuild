@@ -115,7 +115,7 @@ async def process(session, bugs, package, build, status, http_semaphore, command
         return
 
     # by querying this all the time, we slow down the koji command
-    content_length, critpath = await asyncio.gather(
+    content_length, critpath = await gather_or_cancel(
         length(session, buildlog_link(package, build), http_semaphore),
         is_critpath(session, package, http_semaphore),
     )
@@ -140,6 +140,20 @@ async def process(session, bugs, package, build, status, http_semaphore, command
     if critpath:
         message += ' \N{FIRE}'
     p(message, fg=fg)
+
+
+async def gather_or_cancel(*tasks):
+    '''
+    Like asyncio.gather, but if one task fails, others are cancelled
+    '''
+    tasks = [t if asyncio.isfuture(t) else asyncio.create_task(t) for t in tasks]
+    try:
+        return await asyncio.gather(*tasks)
+    finally:
+        for t in tasks:
+            if not t.done():
+                t.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
 
 
 async def main():
@@ -187,18 +201,9 @@ async def main():
                 break
 
         try:
-            try:
-                await asyncio.gather(*jobs)
-            except KojiError as e:
-                sys.exit(str(e))
-        finally:
-            for t in jobs:
-                t.cancel()
-            for t in jobs:
-                try:
-                    await t
-                except:
-                    pass
+            await gather_or_cancel(*jobs)
+        except KojiError as e:
+            sys.exit(str(e))
 
         p(file=sys.stderr)
         for fg, count in counter.most_common():
