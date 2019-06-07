@@ -20,6 +20,7 @@ LIMIT = 1000
 BUGZILLA = 'bugzilla.redhat.com'
 TRACKER = 1686977  # PYTHON38
 LOGLEVEL = logging.WARNING
+LOGLEVEL = logging.DEBUG
 
 EXPLANATION = {
     'red': 'probably FTBFS',
@@ -154,10 +155,24 @@ async def gather_or_cancel(*tasks):
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
+def asyncio_ssl_error_filter(record):
+    '''
+    Do not log asyncio error messages regarding "[SSL: KRB5_S_INIT] application data after close notify"
+
+    See https://github.com/aio-libs/aiohttp/issues/3535
+    '''
+    if sys.version_info < (3, 7, 4):
+        if 'SSL error in data received' in record.getMessage():
+            if '[SSL: KRB5_S_INIT] application data after close notify' in str(record.exc_info):
+                return False
+    return True
+
+
 async def main():
     logging.basicConfig(
         format='%(asctime)s %(name)s %(levelname)s: %(message)s',
         level=LOGLEVEL)
+    logging.getLogger('asyncio').addFilter(asyncio_ssl_error_filter)
 
     http_semaphore = asyncio.Semaphore(20)
     command_semaphore = asyncio.Semaphore(10)
