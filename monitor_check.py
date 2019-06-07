@@ -160,7 +160,7 @@ async def open_bz(package, build, status, browser_lock):
         'short_desc': summary,
         'comment': description,
         'component': str(package),
-        'dependson': 'PYTHON38',
+        'blocked': 'PYTHON38',
         'product': 'Fedora',
         'version': 'rawhide',
         'bug_severity': 'high',
