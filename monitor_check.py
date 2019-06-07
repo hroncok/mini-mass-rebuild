@@ -20,6 +20,7 @@ TAG = 'f31'
 LIMIT = 1000
 BUGZILLA = 'bugzilla.redhat.com'
 TRACKER = 1686977  # PYTHON38
+LOGLEVEL = logging.WARNING
 
 EXPLANATION = {
     'red': 'probably FTBFS',
@@ -159,8 +160,7 @@ async def gather_or_cancel(*tasks):
 async def main():
     logging.basicConfig(
         format='%(asctime)s %(name)s %(levelname)s: %(message)s',
-        level=logging.DEBUG)
-    logging.getLogger('bugzilla.bug').setLevel(logging.INFO)
+        level=LOGLEVEL)
 
     http_semaphore = asyncio.Semaphore(20)
     command_semaphore = asyncio.Semaphore(10)
