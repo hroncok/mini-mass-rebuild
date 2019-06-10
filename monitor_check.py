@@ -43,6 +43,7 @@ EXCLUDE = {
     'python-bashate': 'filed in python-oslo-sphinx, bz 1705932',
     'pysvn': 'filed in python-pycxx, bz 1718318',
     'python-sanic': 'filed in python-uvloop, bz 1718390',
+    'python-ZEO': 'filed in python-uvloop, bz 1718390',
     'gnucash': 'declaration-after-statement',
     'onboard': 'declaration-after-statement',
 }
