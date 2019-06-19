@@ -20,7 +20,7 @@ PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.8/package/([^/]+)/">')
 BUILD = re.compile(r'<a href="/coprs/g/python/python3.8/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
 TAG = 'f31'
-LIMIT = 1000
+LIMIT = 1200
 BUGZILLA = 'bugzilla.redhat.com'
 TRACKER = 1686977  # PYTHON38
 LOGLEVEL = logging.WARNING
