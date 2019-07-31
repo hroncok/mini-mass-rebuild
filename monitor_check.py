@@ -224,7 +224,7 @@ async def gather_or_cancel(*tasks):
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
-async def main(open_bug_reports=False):
+async def main(pkgs=None, open_bug_reports=False):
     logging.basicConfig(
         format='%(asctime)s %(name)s %(levelname)s: %(message)s',
         level=LOGLEVEL)
@@ -266,6 +266,8 @@ async def main(open_bug_reports=False):
                 assert lasthit == 'build'
                 lasthit = 'status'
                 status = hit.group(1)
+                if pkgs and package not in pkgs:
+                    continue
                 jobs.append(asyncio.ensure_future(process(
                     session, bugs, package, build, status,
                     http_semaphore, command_semaphore,
@@ -287,13 +289,17 @@ async def main(open_bug_reports=False):
 
 
 @click.command()
+@click.argument(
+    'pkgs',
+    nargs=-1,
+)
 @click.option(
     '--open-bug-reports/--no-open-bug-reports',
     help='Open a browser page (!) with a bug report template for each '
         + 'package that seems to need a bug report'
 )
-def run(open_bug_reports):
-    asyncio.run(main(open_bug_reports))
+def run(pkgs, open_bug_reports):
+    asyncio.run(main(pkgs, open_bug_reports))
 
 if __name__ == '__main__':
     run()
