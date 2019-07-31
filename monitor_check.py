@@ -177,7 +177,7 @@ async def open_bz(package, build, status, browser_lock):
     summary = f"{package} fails to build with Python 3.8"
 
     description = dedent(f"""
-        {package} fails to build with Python 3.8.0b2.
+        {package} fails to build with Python 3.8.0b3.
 
         This report is automated and not very verbose, but we'll try to get back here with details.
 
