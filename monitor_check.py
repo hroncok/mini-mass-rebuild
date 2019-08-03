@@ -41,7 +41,6 @@ EXCLUDE = {
     'libldb': 'filed in samba',
     'python-parallel-ssh': 'filed in python-gevent, bz 1716342',
     'python-bashate': 'filed in python-oslo-sphinx, bz 1705932',
-    'python-sphinxtesters': 'filed in python-docutils, bz 1716532',
     'python-grafyaml': 'filed in python-oslo-sphinx, bz 1705932',
 }
 
