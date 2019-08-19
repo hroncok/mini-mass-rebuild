@@ -7,7 +7,7 @@ cd $1
     git commit *.spec -m "Rebuilt for Python 3.8" | tee -a ../${1}.log
     git push
   fi
-  fedpkg build --nowait --background 2>&1 | tee -a ../${1}.log
+  fedpkg build --target=f32-python --nowait --background 2>&1 | tee -a ../${1}.log
 cd -
 
 rm -rf $1
