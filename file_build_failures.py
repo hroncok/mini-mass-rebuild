@@ -50,7 +50,7 @@ def open_bz(package):
         'short_desc': summary,
         'comment': description,
         'component': package,
-        'blocked': 'PYTHON38',
+        'blocked': 'PYTHON38,F32FTBFS,F32FailsToInstall',
         'product': 'Fedora',
         'version': 'rawhide',
         'bug_severity': 'high',
