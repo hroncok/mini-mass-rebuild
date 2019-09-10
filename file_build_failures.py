@@ -29,7 +29,7 @@ def open_bz(package):
     summary = f"{package} fails to build with Python 3.8 on Fedora 32+"
 
     description = dedent(f"""
-        {package} fails to build with Python 3.8.0b3 in Fedora 32.
+        {package} fails to build with Python 3.8.0b4 in Fedora 32.
 
         See the build failures at https://koji.fedoraproject.org/koji/search?match=glob&type=package&terms={package}
 
