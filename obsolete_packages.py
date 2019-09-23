@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from collections import defaultdict
 
 
 def repoquery(*args, **kwargs):
@@ -25,19 +26,13 @@ def repoquery(*args, **kwargs):
 
 
 def old_pkgs():
-    r = set()
+    r = []
     for version in 30, 31:
         for dependency in 'python(abi) = 3.7', 'libpython3.7m.so.1.0()(64bit)':
-            r |= set(repoquery(version=version,
+            r.extend(repoquery(version=version,
                                whatrequires=dependency,
-                               qf='%{NAME}'))
+                               qf='%{NAME} %{EPOCH}:%{VERSION}-%{RELEASE}'))
     return r
-
-
-def removed_pkgs():
-    old = old_pkgs()
-    new = set(repoquery(all=True, qf='%{NAME}'))
-    return old - new
 
 
 class SortableEVR:
@@ -55,11 +50,16 @@ class SortableEVR:
                                stdout=subprocess.DEVNULL) == 12
 
 
-def newest_version(pkg):
-    qf = '%{EPOCH}:%{VERSION}-%{RELEASE}'
-    versions = (repoquery(pkg, version=30, qf=qf) +
-                repoquery(pkg, version=31, qf=qf))
-    return max(versions, key=SortableEVR)
+def removed_pkgs():
+    name_versions = defaultdict(set)
+    old_name_evrs = old_pkgs()
+    new = set(repoquery(all=True, qf='%{NAME}'))
+    for name_evr in old_name_evrs:
+        name, _, evr = name_evr.partition(' ')
+        if name not in new:
+            name_versions[name].add(evr)
+    return {name: max(versions, key=SortableEVR)
+            for name, versions in name_versions.items()}
 
 
 def drop_dist(evr):
@@ -94,8 +94,9 @@ def format_obsolete(pkg, evr):
     return f'%obsolete {pkg} {evr}'
 
 
-for pkg in sorted(removed_pkgs()):
-    version = drop_0epoch(drop_dist(newest_version(pkg)))
+rp = removed_pkgs()
+for pkg in sorted(rp):
+    version = drop_0epoch(drop_dist(rp[pkg]))
     whatobsoletes = repoquery(whatobsoletes=f'{pkg} = {version}', qf='%{NAME}')
     if not whatobsoletes or whatobsoletes == ['fedora-obsolete-packages']:
         print(format_obsolete(pkg, version))
