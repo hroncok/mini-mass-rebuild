@@ -28,7 +28,9 @@ def repoquery(*args, **kwargs):
 def old_pkgs():
     r = []
     for version in 30, 31:
-        for dependency in 'python(abi) = 3.7', 'libpython3.7m.so.1.0()(64bit)':
+        for dependency in ('python(abi) = 3.7',
+                           'libpython3.7m.so.1.0()(64bit)',
+                           'libpython3.7dm.so.1.0()(64bit)'):
             r.extend(repoquery(version=version,
                                whatrequires=dependency,
                                qf='%{NAME} %{EPOCH}:%{VERSION}-%{RELEASE}'))
