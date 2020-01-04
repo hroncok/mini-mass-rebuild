@@ -13,16 +13,16 @@ from click import secho
 from collections import Counter
 
 
-MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.8/monitor/'
-BUILDLOG = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.8/fedora-rawhide-x86_64/{build:08d}-{package}/build.log.gz'
+MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.9/monitor/'
+BUILDLOG = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.9/fedora-rawhide-x86_64/{build:08d}-{package}/build.log.gz'
 PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=master&global_component={package}'
-PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.8/package/([^/]+)/">')
-BUILD = re.compile(r'<a href="/coprs/g/python/python3.8/build/([^/]+)/">')
+PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.9/package/([^/]+)/">')
+BUILD = re.compile(r'<a href="/coprs/g/python/python3.9/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
 TAG = 'f31'
 LIMIT = 1200
 BUGZILLA = 'bugzilla.redhat.com'
-TRACKER = 1686977  # PYTHON38
+TRACKER = 1785415  # PYTHON39
 LOGLEVEL = logging.WARNING
 
 EXPLANATION = {
@@ -35,13 +35,7 @@ EXPLANATION = {
 
 # FTBS packages for which we don't open bugs (yet)
 EXCLUDE = {
-    'brltty': 'filed in alsa',
-    'libtevent': 'filed in samba',
-    'libtalloc': 'filed in samba',
-    'libldb': 'filed in samba',
-    'python-parallel-ssh': 'filed in python-gevent, bz 1716342',
-    'python-bashate': 'filed in python-oslo-sphinx, bz 1705932',
-    'python-grafyaml': 'filed in python-oslo-sphinx, bz 1705932',
+    #'brltty': 'filed in alsa',
 }
 
 logger = logging.getLogger('monitor_check')
@@ -173,23 +167,26 @@ async def process(
 
 
 async def open_bz(package, build, status, browser_lock):
-    summary = f"{package} fails to build with Python 3.8"
+    summary = f"{package} fails to build with Python 3.9"
 
     description = dedent(f"""
-        {package} fails to build with Python 3.8.0b3.
+        {package} fails to build with Python 3.9.0a2.
 
         This report is automated and not very verbose, but we'll try to get back here with details.
 
         For the build logs, see:
-        https://copr-be.cloud.fedoraproject.org/results/@python/python3.8/fedora-rawhide-x86_64/{build:08}-{package}/
+        https://copr-be.cloud.fedoraproject.org/results/@python/python3.9/fedora-rawhide-x86_64/{build:08}-{package}/
 
-        For all our attempts to build {package} with Python 3.8, see:
-        https://copr.fedorainfracloud.org/coprs/g/python/python3.8/package/{package}/
+        For all our attempts to build {package} with Python 3.9, see:
+        https://copr.fedorainfracloud.org/coprs/g/python/python3.9/package/{package}/
 
-        Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if your package builds with Python 3.8:
-        https://copr.fedorainfracloud.org/coprs/g/python/python3.8/
+        Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if your package builds with Python 3.9:
+        https://copr.fedorainfracloud.org/coprs/g/python/python3.9/
 
         Let us know here if you have any questions.
+
+        Python 3.9 will be included in Fedora 33, but the initial bootstrapping has already started.
+        A build failure this early in the bootstrap sequence blocks us very much.
     """)
 
     url_prefix = 'https://bugzilla.redhat.com/enter_bug.cgi?'
@@ -197,10 +194,11 @@ async def open_bz(package, build, status, browser_lock):
         'short_desc': summary,
         'comment': description,
         'component': str(package),
-        'blocked': 'PYTHON38',
+        'blocked': 'PYTHON39',
         'product': 'Fedora',
         'version': 'rawhide',
-        'bug_severity': 'high',
+        #'bug_severity': 'high',
+        'cc': 'mhroncok@redhat.com,cstratak@redhat.com'
     }
 
     # Rate-limit opening browser tabs
