@@ -14,11 +14,12 @@ from collections import Counter
 
 
 MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.9/monitor/'
-BUILDLOG = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.9/fedora-rawhide-x86_64/{build:08d}-{package}/build.log.gz'
+INDEX = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.9/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
 PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=master&global_component={package}'
 PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.9/package/([^/]+)/">')
 BUILD = re.compile(r'<a href="/coprs/g/python/python3.9/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
+RPM_FILE = "<td class='t'>RPM File</td>"
 TAG = 'f31'
 LIMIT = 1200
 BUGZILLA = 'bugzilla.redhat.com'
@@ -73,8 +74,35 @@ async def length(session, url, http_semaphore):
             return int(response.headers.get('content-length'))
 
 
+async def failed_but_built(session, url, http_semaphore):
+    """
+    Sometimes, the package actually built, but is only marked as failed:
+    https://pagure.io/copr/copr/issue/1209
+
+    The build.log would be long, so we would attempt to open bugzillas.
+    Here we get the index page of the results directory and we determine that:
+
+     - failed builds only have 1 SRPM
+     - succeeded builds have 1 SRPM and at least 1 built RPM
+    """
+    async with http_semaphore:
+        logger.debug('failed_but_built %s', url)
+        async with session.get(url) as response:
+            text = await response.text()
+            rpm_count = text.count(RPM_FILE)
+            if rpm_count > 1:
+                with open('failed_but_built.lst', 'a') as f:
+                    print(url, file=f)
+                return True
+            return False
+
+
+def index_link(package, build):
+    return INDEX.format(package=package, build=build)
+
+
 def buildlog_link(package, build):
-    return BUILDLOG.format(package=package, build=build)
+    return index_link(package, build) + 'build.log.gz'
 
 
 class KojiError (Exception):
@@ -163,7 +191,8 @@ async def process(
         and (content_length > LIMIT)
         and (str(package) not in EXCLUDE)
     ):
-        await open_bz(package, build, status, browser_lock)
+        if not await failed_but_built(session, index_link(package, build), http_semaphore):
+            await open_bz(package, build, status, browser_lock)
 
 
 async def open_bz(package, build, status, browser_lock):
