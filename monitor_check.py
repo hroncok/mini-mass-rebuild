@@ -215,7 +215,7 @@ async def open_bz(package, build, status, browser_lock):
         Let us know here if you have any questions.
 
         Python 3.9 will be included in Fedora 33. To make that update smoother, we're building Fedora packages with early pre-releases of Python 3.9.
-        A build failure prevents us from testing all dependent packages (transitive [Build]Requires), so it's important for us to get it fixed soon.
+        A build failure prevents us from testing all dependent packages (transitive [Build]Requires), so if this package is required a lot, it's important for us to get it fixed soon.
         We'd appreciate help from the people who know this package best, but if you don't want to work on this now, let us know so we can try to work around it on our side.
     """)
 
