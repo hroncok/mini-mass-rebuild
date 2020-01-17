@@ -37,6 +37,7 @@ EXPLANATION = {
 # FTBS packages for which we don't open bugs (yet)
 EXCLUDE = {
     'dnf-plugins-extras': 'filed in rpmconf as bz1788922',
+    'python-onionbalance': 'filed in setproctitle as bz1792059',
 }
 
 logger = logging.getLogger('monitor_check')
