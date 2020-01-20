@@ -41,6 +41,8 @@ EXCLUDE = {
     'python-jupyter-console': 'filed in ipython as bz1786893',
     'xen': 'waits for ocaml rebuilds to finish',
     'libguestfs': 'waits for ocaml rebuilds to finish',
+    'z3': 'waits for ocaml rebuilds to finish',
+    'pyxattr': 'fails in Copr only',
 }
 
 # Packages failing for root.log issues with long build.logs
@@ -48,6 +50,7 @@ EXCLUDE = {
 LONG_LOGS = {
     'pki-core': 1203,
     'python-black': 2207,
+    'python-chaospy': 1583,
     'python-copr': 2105,
     'python-decopatch': 1688,
     'python-makefun': 1667,
