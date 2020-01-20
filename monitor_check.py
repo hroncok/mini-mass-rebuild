@@ -38,6 +38,22 @@ EXPLANATION = {
 EXCLUDE = {
     'dnf-plugins-extras': 'filed in rpmconf as bz1788922',
     'python-onionbalance': 'filed in setproctitle as bz1792059',
+    'python-jupyter-console': 'filed in ipython as bz1786893',
+    'xen': 'waits for ocaml rebuilds to finish',
+    'libguestfs': 'waits for ocaml rebuilds to finish',
+}
+
+# Packages failing for root.log issues with long build.logs
+# Most likely caused by a lot of RPM warnings or %pyproject_buildrequires
+LONG_LOGS = {
+    'pki-core': 1203,
+    'python-black': 2207,
+    'python-copr': 2105,
+    'python-decopatch': 1688,
+    'python-makefun': 1667,
+    'python-pytest-cases': 1719,
+    'python-pytest-harvest': 1802,
+    'python-pytest-steps': 1791,
 }
 
 logger = logging.getLogger('monitor_check')
@@ -169,6 +185,8 @@ async def process(
 
     message = f'{package} failed len={content_length}'
 
+    limit = LONG_LOGS.get(package, 0) * 1.2 or LIMIT
+
     if package in EXCLUDE:
         bz = None
         fg = 'cyan'
@@ -180,7 +198,7 @@ async def process(
             fg = 'yellow'
 
         if not bz or bz.status == "CLOSED":
-            fg = 'red' if content_length > LIMIT else 'blue'
+            fg = 'red' if content_length > limit else 'blue'
 
     if critpath:
         message += ' \N{FIRE}'
@@ -189,7 +207,7 @@ async def process(
     if (
         browser_lock
         and (not bz or bz.status == "CLOSED")
-        and (content_length > LIMIT)
+        and (content_length > limit)
         and (str(package) not in EXCLUDE)
     ):
         if not await failed_but_built(session, index_link(package, build), http_semaphore):
