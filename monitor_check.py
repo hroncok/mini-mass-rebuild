@@ -45,6 +45,7 @@ EXCLUDE = {
     'pyxattr': 'fails in Copr only',
     'python-fsleyes': 'filed in python-rpm-generators as bz1758141',
     'python-kubernetes': 'filed in python-rpm-generators as bz1758141',
+    'tuned': 'filed in pyudev as bz1793485',
 }
 
 # Packages failing for root.log issues with long build.logs
