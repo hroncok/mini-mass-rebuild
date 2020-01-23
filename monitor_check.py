@@ -46,6 +46,7 @@ EXCLUDE = {
     'python-fsleyes': 'filed in python-rpm-generators as bz1758141',
     'python-kubernetes': 'filed in python-rpm-generators as bz1758141',
     'tuned': 'filed in pyudev as bz1793485',
+    'pyosmium': 'filed in gcc as bz1794094',
 }
 
 # Packages failing for root.log issues with long build.logs
