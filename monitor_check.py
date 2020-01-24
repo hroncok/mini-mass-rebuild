@@ -47,6 +47,7 @@ EXCLUDE = {
     'python-kubernetes': 'filed in python-rpm-generators as bz1758141',
     'tuned': 'filed in pyudev as bz1793485',
     'pyosmium': 'filed in gcc as bz1794094',
+    'lvm2': 'filed in pyudev as bz1792793',
 }
 
 # Packages failing for root.log issues with long build.logs
