@@ -4,7 +4,7 @@ import bugzilla
 import logging
 import re
 import sys
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from textwrap import dedent
 import webbrowser
 
@@ -148,7 +148,7 @@ async def is_retired(package, command_semaphore):
 
 
 async def is_critpath(session, package, http_semaphore):
-    json = await fetch(session, PDC.format(package=package), http_semaphore, json=True)
+    json = await fetch(session, PDC.format(package=quote(package)), http_semaphore, json=True)
     for result in json['results']:
         if result['type'] == 'rpm':
             return result['critical_path']
