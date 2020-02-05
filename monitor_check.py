@@ -175,7 +175,7 @@ def p(*args, **kwargs):
 
 async def process(
     session, bugs, package, build, status, http_semaphore, command_semaphore,
-    *, browser_lock=None
+    *, browser_lock=None, blues_file=None
 ):
     if status != 'failed':
         return
@@ -211,6 +211,8 @@ async def process(
     if critpath:
         message += ' \N{FIRE}'
     p(message, fg=fg)
+    if blues_file and fg == 'blue':
+        print(package, file=blues_file)
 
     if (
         browser_lock
@@ -278,7 +280,7 @@ async def gather_or_cancel(*tasks):
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
-async def main(pkgs=None, open_bug_reports=False):
+async def main(pkgs=None, open_bug_reports=False, blues_file=None):
     logging.basicConfig(
         format='%(asctime)s %(name)s %(levelname)s: %(message)s',
         level=LOGLEVEL)
@@ -325,7 +327,8 @@ async def main(pkgs=None, open_bug_reports=False):
                 jobs.append(asyncio.ensure_future(process(
                     session, bugs, package, build, status,
                     http_semaphore, command_semaphore,
-                    browser_lock=browser_lock
+                    browser_lock=browser_lock,
+                    blues_file=blues_file
                 )))
 
             if 'Possible build states:' in line:
@@ -352,8 +355,13 @@ async def main(pkgs=None, open_bug_reports=False):
     help='Open a browser page (!) with a bug report template for each '
         + 'package that seems to need a bug report'
 )
-def run(pkgs, open_bug_reports):
-    asyncio.run(main(pkgs, open_bug_reports))
+@click.option(
+    '--blues-file',
+    type=click.File('w'),
+    help='Dump blue packages to a given file'
+)
+def run(pkgs, open_bug_reports, blues_file=None):
+    asyncio.run(main(pkgs, open_bug_reports, blues_file))
 
 if __name__ == '__main__':
     run()
