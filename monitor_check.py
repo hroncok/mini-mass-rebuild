@@ -148,11 +148,14 @@ async def is_retired(package, command_semaphore):
 
 
 async def is_critpath(session, package, http_semaphore):
-    json = await fetch(session, PDC.format(package=quote(package)), http_semaphore, json=True)
-    for result in json['results']:
-        if result['type'] == 'rpm':
-            return result['critical_path']
-    else:
+    try:
+        json = await fetch(session, PDC.format(package=quote(package)), http_semaphore, json=True)
+        for result in json['results']:
+            if result['type'] == 'rpm':
+                return result['critical_path']
+        else:
+            raise ValueError()
+    except (aiohttp.ContentTypeError, ValueError):
         print(f'Could not check if {package} is \N{FIRE}', file=sys.stderr)
         return False
 
