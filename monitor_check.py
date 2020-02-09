@@ -36,18 +36,10 @@ EXPLANATION = {
 
 # FTBS packages for which we don't open bugs (yet)
 EXCLUDE = {
-    'dnf-plugins-extras': 'filed in rpmconf as bz1788922',
     'python-onionbalance': 'filed in setproctitle as bz1792059',
-    'python-jupyter-console': 'filed in ipython as bz1786893',
-    'xen': 'waits for ocaml rebuilds to finish',
-    'z3': 'waits for ocaml rebuilds to finish',
-    'coq': 'waits for ocaml rebuilds to finish',
     'pyxattr': 'fails in Copr only',
     'python-fsleyes': 'filed in python-rpm-generators as bz1758141',
     'python-kubernetes': 'filed in python-rpm-generators as bz1758141',
-    'tuned': 'filed in pyudev as bz1793485',
-    'pyosmium': 'filed in gcc as bz1794094',
-    'lvm2': 'filed in pyudev as bz1792793',
 }
 
 # Packages failing for root.log issues with long build.logs
