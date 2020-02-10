@@ -11,12 +11,12 @@ def drop_release(version):
 
 
 print(f'Checking {pkg}')
-cmd = 'copr get-package @python/python3.8 --with-all-builds --name'.split()
+cmd = 'copr get-package @python/python3.9 --with-all-builds --name'.split()
 pkg_detail = json.loads(subprocess.check_output(cmd + [pkg], text=True))
 
 succeeded = [build for build in pkg_detail['builds']
              if build['state'] == 'succeeded'
-             and build['project_dirname'] == 'python3.8']
+             and build['project_dirname'] == 'python3.9']
 
 versions = dict((build['id'], drop_release(build['source_package']['version']))
                 for build in succeeded)
