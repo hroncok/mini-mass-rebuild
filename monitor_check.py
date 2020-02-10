@@ -189,6 +189,10 @@ async def process(
     message = f'{package} failed len={content_length}'
 
     limit = LONG_LOGS.get(package, 0) * 1.2 or LIMIT
+    longlog = content_length > limit
+
+    if blues_file and not longlog:
+        print(package, file=blues_file)
 
     if package in EXCLUDE:
         bz = None
@@ -201,13 +205,11 @@ async def process(
             fg = 'yellow'
 
         if not bz or bz.status == "CLOSED":
-            fg = 'red' if content_length > limit else 'blue'
+            fg = 'red' if longlog else 'blue'
 
     if critpath:
         message += ' \N{FIRE}'
     p(message, fg=fg)
-    if blues_file and fg == 'blue':
-        print(package, file=blues_file)
 
     if (
         browser_lock
@@ -353,7 +355,7 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None):
 @click.option(
     '--blues-file',
     type=click.File('w'),
-    help='Dump blue packages to a given file'
+    help='Dump blue-ish packages to a given file'
 )
 def run(pkgs, open_bug_reports, blues_file=None):
     asyncio.run(main(pkgs, open_bug_reports, blues_file))
