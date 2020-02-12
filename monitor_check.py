@@ -40,6 +40,7 @@ EXCLUDE = {
     'pyxattr': 'fails in Copr only',
     'python-fsleyes': 'filed in python-rpm-generators as bz1758141',
     'python-kubernetes': 'filed in python-rpm-generators as bz1758141',
+    'python-certbot-dns-rfc2136': 'filed in python-dns as bz1801247',
 }
 
 # Packages failing for root.log issues with long build.logs
