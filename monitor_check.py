@@ -255,7 +255,7 @@ async def open_bz(package, build, status, browser_lock):
         'product': 'Fedora',
         'version': 'rawhide',
         #'bug_severity': 'high',
-        'cc': 'mhroncok@redhat.com,cstratak@redhat.com'
+        'cc': 'mhroncok@redhat.com,cstratak@redhat.com,mplch@redhat.com'
     }
 
     # Rate-limit opening browser tabs
