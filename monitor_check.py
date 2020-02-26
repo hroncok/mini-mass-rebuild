@@ -20,7 +20,7 @@ PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.9/package/([^/]+)/">')
 BUILD = re.compile(r'<a href="/coprs/g/python/python3.9/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
 RPM_FILE = "<td class='t'>RPM File</td>"
-TAG = 'f32'
+TAG = 'f33'
 LIMIT = 1200
 BUGZILLA = 'bugzilla.redhat.com'
 TRACKER = 1785415  # PYTHON39
