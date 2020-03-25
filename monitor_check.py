@@ -43,7 +43,6 @@ EXCLUDE = {
     'python-certbot-dns-rfc2136': 'filed in python-dns as bz1801247',
     'python-mutatormath': 'filed in fonttools as bz1809062',
     'asv': 'filed in feedparser as bz1807186',
-    'pcp': 'filed in setools as bz1813076',
     'python-apsw': 'https://pagure.io/copr/copr/issue/1315',
 }
 
