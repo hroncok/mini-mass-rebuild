@@ -44,6 +44,7 @@ EXCLUDE = {
     'python-mutatormath': 'filed in fonttools as bz1809062',
     'asv': 'filed in feedparser as bz1807186',
     'python-apsw': 'https://pagure.io/copr/copr/issue/1315',
+    'dee': 'filed in vala as bz1817654',
 }
 
 # Packages failing for root.log issues with long build.logs
