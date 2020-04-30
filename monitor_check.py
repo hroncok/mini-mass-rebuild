@@ -38,9 +38,6 @@ EXPLANATION = {
 EXCLUDE = {
     'python-onionbalance': 'filed in setproctitle as bz1792059',
     'pyxattr': 'fails in Copr only',
-    'python-fsleyes': 'filed in python-rpm-generators as bz1758141',
-    'python-kubernetes': 'filed in python-rpm-generators as bz1758141',
-    'python-certbot-dns-rfc2136': 'filed in python-dns as bz1801247',
     'python-mutatormath': 'filed in fonttools as bz1809062',
     'asv': 'filed in feedparser as bz1807186',
     'python-apsw': 'https://pagure.io/copr/copr/issue/1315',
