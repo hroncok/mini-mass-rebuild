@@ -1,1 +1,9 @@
-echo $1 $(http $(grep 'Task info' $1.log | cut -d' ' -f3) | grep 'mock exited with status' | cut -d';' -f2 | sed -Er 's@see ([^\.]+)\.log for more information</pre>@\1@')
+task=$(grep 'Task info' $1.log | cut -d' ' -f3)
+subtask=$(http $task | grep -E 'taskID=[0-9]+" class="taskfailed"' | head -n1 | sed -E 's/.+=([0-9]+)".+/\1/')
+buildlog=https://kojipkgs.fedoraproject.org//work/tasks/${subtask: -4}/${subtask}/build.log
+len=$(http HEAD $buildlog -h | grep content-length | cut -d" " -f2 | tr -d '[:space:]')
+if (( $len > 1300 )); then
+    echo $1 build
+else
+    echo $1 root
+fi
