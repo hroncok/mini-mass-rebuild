@@ -40,7 +40,6 @@ EXCLUDE = {
     'pyxattr': 'fails in Copr only',
     'python-mutatormath': 'filed in fonttools as bz1809062',
     'asv': 'filed in feedparser as bz1807186',
-    'python-apsw': 'https://pagure.io/copr/copr/issue/1315',
     'dee': 'filed in vala as bz1817654',
 }
 
@@ -240,10 +239,21 @@ async def open_bz(package, build, status, browser_lock):
         Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if your package builds with Python 3.9:
         https://copr.fedorainfracloud.org/coprs/g/python/python3.9/
 
+        The real Python 3.9 rebuild is in progress in a Koji side tag.
+
+        If you fix this bug, please don't rebuild the package in regular rawhide, but do it in the side tag with:
+
+            $ fedpkg build --target=f33-python
+
+        The rebuild is progressing slowly and it is possible this package won't have all the required build dependencies yet. If that's the case, please just leave the fix committed and pushed and we will eventually rebuild it for you.
+
+        You are not asked to go and try rebuild all the missing dependencies yourself. If you know there is a bootstrap loop in the dependencies, let me know and we can untangle it together.
+
+        If you want to test your fix or reproduce the failure, you can still use the Copr repo mentioned above.
+
         Let us know here if you have any questions.
 
-        Python 3.9 will be included in Fedora 33. To make that update smoother, we're building Fedora packages with early pre-releases of Python 3.9.
-        A build failure prevents us from testing all dependent packages (transitive [Build]Requires), so if this package is required a lot, it's important for us to get it fixed soon.
+        Python 3.9 will be included in Fedora 33. A build failure prevents us from rebuilding all dependent packages (transitive [Build]Requires), so if this package is required a lot, it's important for us to get it fixed soon.
         We'd appreciate help from the people who know this package best, but if you don't want to work on this now, let us know so we can try to work around it on our side.
     """)
 
