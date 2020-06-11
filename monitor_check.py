@@ -236,25 +236,16 @@ async def open_bz(package, build, status, browser_lock):
         For all our attempts to build {package} with Python 3.9, see:
         https://copr.fedorainfracloud.org/coprs/g/python/python3.9/package/{package}/
 
-        Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if your package builds with Python 3.9:
+        Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if helps you to debug the issue.
         https://copr.fedorainfracloud.org/coprs/g/python/python3.9/
 
-        The real Python 3.9 rebuild is in progress in a Koji side tag.
-
-        If you fix this bug, please don't rebuild the package in regular rawhide, but do it in the side tag with:
-
-            $ fedpkg build --target=f33-python
-
-        The rebuild is progressing slowly and it is possible this package won't have all the required build dependencies yet. If that's the case, please just leave the fix committed and pushed and we will eventually rebuild it for you.
-
-        You are not asked to go and try rebuild all the missing dependencies yourself. If you know there is a bootstrap loop in the dependencies, let me know and we can untangle it together.
-
-        If you want to test your fix or reproduce the failure, you can still use the Copr repo mentioned above.
+        However, Fedora 33+ already contains Python 3.9, so the problem should also happen in normal mock or Koji.
 
         Let us know here if you have any questions.
 
-        Python 3.9 will be included in Fedora 33. A build failure prevents us from rebuilding all dependent packages (transitive [Build]Requires), so if this package is required a lot, it's important for us to get it fixed soon.
-        We'd appreciate help from the people who know this package best, but if you don't want to work on this now, let us know so we can try to work around it on our side.
+        A build failure prevents us from rebuilding the package later in the Fedoa 33 life cycle in case the ABI of Python 3.9 or the version of the bytecode cache changes.
+
+        We'd appreciate help from the people who know this package best, but if you don't want to work on this now, let us know so we can try to work around it on our side if needed.
     """)
 
     url_prefix = 'https://bugzilla.redhat.com/enter_bug.cgi?'
