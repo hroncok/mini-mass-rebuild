@@ -79,7 +79,7 @@ async def fetch(session, url, http_semaphore, *, json=False):
             async with session.get(url) as response:
                 if json:
                     return await response.json()
-                return await response.text()
+                return await response.text('utf-8')
         except aiohttp.client_exceptions.ServerDisconnectedError:
             await asyncio.sleep(1)
             return await fetch(session, url, http_semaphore, json=json)
@@ -90,6 +90,17 @@ async def length(session, url, http_semaphore):
         logger.debug('length %s', url)
         async with session.head(url) as response:
             return int(response.headers.get('content-length'))
+
+
+async def is_cmake(session, url, http_semaphore):
+    try:
+        content = await fetch(session, url, http_semaphore)
+    except aiohttp.client_exceptions.ClientPayloadError:
+        logger.debug('broken content %s', url)
+        return False
+    make = 'No targets specified and no makefile found.' in content
+    cmake = '/usr/bin/cmake' in content
+    return make and cmake
 
 
 async def failed_but_built(session, url, http_semaphore):
@@ -195,10 +206,13 @@ async def process(
     if blues_file and not longlog:
         print(package, file=blues_file)
 
-    if package in EXCLUDE:
+    if package in EXCLUDE or await is_cmake(session, buildlog_link(package, build), http_semaphore):
         bz = None
         fg = 'cyan'
-        message += f' (excluded: {EXCLUDE[package]})'
+        try:
+            message += f' (excluded: {EXCLUDE[package]})'
+        except KeyError:
+            message += ' (excluded: cmake out of tree problem)'
     else:
         bz = bug(bugs, package)
         if bz:
