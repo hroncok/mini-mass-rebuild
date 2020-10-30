@@ -13,17 +13,17 @@ from click import secho
 from collections import Counter
 
 
-MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.9/monitor/'
-INDEX = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.9/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
+MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.10/monitor/'
+INDEX = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
 PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=master&global_component={package}'
-PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.9/package/([^/]+)/">')
-BUILD = re.compile(r'<a href="/coprs/g/python/python3.9/build/([^/]+)/">')
+PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.10/package/([^/]+)/">')
+BUILD = re.compile(r'<a href="/coprs/g/python/python3.10/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
 RPM_FILE = "<td class='t'>RPM File</td>"
-TAG = 'f33'
+TAG = 'f34'
 LIMIT = 1200
 BUGZILLA = 'bugzilla.redhat.com'
-TRACKER = 1785415  # PYTHON39
+TRACKER = 1890881  # PYTHON3.10
 LOGLEVEL = logging.WARNING
 
 EXPLANATION = {
@@ -237,29 +237,27 @@ async def process(
 
 
 async def open_bz(package, build, status, browser_lock):
-    summary = f"{package} fails to build with Python 3.9"
+    summary = f"{package} fails to build with Python 3.10"
 
     description = dedent(f"""
-        {package} fails to build with Python 3.9.0b5.
+        {package} fails to build with Python 3.10.0a1.
 
         This report is automated and not very verbose, but we'll try to get back here with details.
 
         For the build logs, see:
-        https://copr-be.cloud.fedoraproject.org/results/@python/python3.9/fedora-rawhide-x86_64/{build:08}-{package}/
+        https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08}-{package}/
 
-        For all our attempts to build {package} with Python 3.9, see:
-        https://copr.fedorainfracloud.org/coprs/g/python/python3.9/package/{package}/
+        For all our attempts to build {package} with Python 3.10, see:
+        https://copr.fedorainfracloud.org/coprs/g/python/python3.10/package/{package}/
 
-        Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if helps you to debug the issue.
-        https://copr.fedorainfracloud.org/coprs/g/python/python3.9/
-
-        However, Fedora 33+ already contains Python 3.9, so the problem should also happen in normal mock or Koji.
+        Testing and mass rebuild of packages is happening in copr. You can follow these instructions to test locally in mock if your package builds with Python 3.10:
+        https://copr.fedorainfracloud.org/coprs/g/python/python3.10/
 
         Let us know here if you have any questions.
 
-        A build failure prevents us from rebuilding the package later in the Fedoa 33 life cycle in case the ABI of Python 3.9 or the version of the bytecode cache changes.
-
-        We'd appreciate help from the people who know this package best, but if you don't want to work on this now, let us know so we can try to work around it on our side if needed.
+        Python 3.10 will be included in Fedora 35. To make that update smoother, we're building Fedora packages with early pre-releases of Python 3.10.
+        A build failure prevents us from testing all dependent packages (transitive [Build]Requires), so if this package is required a lot, it's important for us to get it fixed soon.
+        We'd appreciate help from the people who know this package best, but if you don't want to work on this now, let us know so we can try to work around it on our side.
     """)
 
     url_prefix = 'https://bugzilla.redhat.com/enter_bug.cgi?'
@@ -267,11 +265,11 @@ async def open_bz(package, build, status, browser_lock):
         'short_desc': summary,
         'comment': description,
         'component': str(package),
-        'blocked': 'PYTHON39',
+        'blocked': TRACKER,
         'product': 'Fedora',
         'version': 'rawhide',
         #'bug_severity': 'high',
-        'cc': 'mhroncok@redhat.com,cstratak@redhat.com,mplch@redhat.com'
+        'cc': 'mhroncok@redhat.com,thrnciar@redhat.com'
     }
 
     # Rate-limit opening browser tabs
