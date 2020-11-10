@@ -36,11 +36,7 @@ EXPLANATION = {
 
 # FTBS packages for which we don't open bugs (yet)
 EXCLUDE = {
-    'python-onionbalance': 'filed in setproctitle as bz1792059',
     'pyxattr': 'fails in Copr only',
-    'python-mutatormath': 'filed in fonttools as bz1809062',
-    'asv': 'filed in feedparser as bz1807186',
-    'dee': 'filed in vala as bz1817654',
 }
 
 # Packages failing for root.log issues with long build.logs
@@ -240,7 +236,7 @@ async def open_bz(package, build, status, browser_lock):
     summary = f"{package} fails to build with Python 3.10"
 
     description = dedent(f"""
-        {package} fails to build with Python 3.10.0a1.
+        {package} fails to build with Python 3.10.0a2.
 
         This report is automated and not very verbose, but we'll try to get back here with details.
 
