@@ -4,7 +4,7 @@ import bugzilla
 import logging
 import re
 import sys
-from urllib.parse import urlencode, quote
+from urllib.parse import urlencode, quote, unquote
 from textwrap import dedent
 import webbrowser
 
@@ -319,7 +319,7 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None):
             if hit:
                 assert lasthit == 'status'
                 lasthit = 'package'
-                package = hit.group(1)
+                package = unquote(hit.group(1))
 
             hit = BUILD.search(line)
             if hit:
