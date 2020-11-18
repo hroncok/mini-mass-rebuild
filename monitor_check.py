@@ -53,6 +53,7 @@ LONG_LOGS = {
     'python-pytest-steps': 1791,
     'python-numpydoc': 2700,
     'python-jupyter-client': 2700,
+    'python-sklearn-nature-inspired-algorithms': 2300,
 }
 
 logger = logging.getLogger('monitor_check')
