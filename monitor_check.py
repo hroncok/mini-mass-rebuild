@@ -4,7 +4,7 @@ import bugzilla
 import logging
 import re
 import sys
-from urllib.parse import urlencode, quote
+from urllib.parse import urlencode, quote, unquote
 from textwrap import dedent
 import webbrowser
 
@@ -51,6 +51,9 @@ LONG_LOGS = {
     'python-pytest-cases': 1719,
     'python-pytest-harvest': 1802,
     'python-pytest-steps': 1791,
+    'python-numpydoc': 2700,
+    'python-jupyter-client': 2700,
+    'python-sklearn-nature-inspired-algorithms': 2300,
 }
 
 logger = logging.getLogger('monitor_check')
@@ -317,7 +320,7 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None):
             if hit:
                 assert lasthit == 'status'
                 lasthit = 'package'
-                package = hit.group(1)
+                package = unquote(hit.group(1))
 
             hit = BUILD.search(line)
             if hit:
