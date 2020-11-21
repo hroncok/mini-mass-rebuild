@@ -205,13 +205,10 @@ async def process(
     if blues_file and not longlog:
         print(package, file=blues_file)
 
-    if package in EXCLUDE or await is_cmake(session, buildlog_link(package, build), http_semaphore):
+    if package in EXCLUDE:
         bz = None
         fg = 'cyan'
-        try:
-            message += f' (excluded: {EXCLUDE[package]})'
-        except KeyError:
-            message += ' (excluded: cmake out of tree problem)'
+        message += f' (excluded: {EXCLUDE[package]})'
     else:
         bz = bug(bugs, package)
         if bz:
