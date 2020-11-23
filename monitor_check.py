@@ -55,6 +55,10 @@ LONG_LOGS = {
     'python-jupyter-client': 2700,
     'python-sklearn-nature-inspired-algorithms': 2300,
     'python-notebook': 3100,
+    'python-pint': 2713,
+    'python-pytest-cases': 2197,
+    'python-pytest-harvest': 2279,
+    'python-pytest-steps': 2264,
 }
 
 logger = logging.getLogger('monitor_check')
