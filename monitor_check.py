@@ -38,6 +38,7 @@ EXPLANATION = {
 # FTBS packages for which we don't open bugs (yet)
 EXCLUDE = {
     'pyxattr': 'fails in Copr only',
+    'mingw-python3': 'pending update to 3.10',
 }
 
 # Packages failing for root.log issues with long build.logs
