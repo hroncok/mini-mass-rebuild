@@ -61,6 +61,7 @@ LONG_LOGS = {
     'python-pytest-cases': 2197,
     'python-pytest-harvest': 2279,
     'python-pytest-steps': 2264,
+    'pythran': 2900,
 }
 
 logger = logging.getLogger('monitor_check')
