@@ -32,6 +32,7 @@ EXPLANATION = {
     'yellow': 'reported',
     'green': 'retired',
     'cyan': 'excluded from bug filing',
+    'magenta': 'copr timeout',
 }
 
 # FTBS packages for which we don't open bugs (yet)
@@ -107,6 +108,15 @@ async def is_cmake(session, url, http_semaphore):
     return make and cmake
 
 
+async def is_timeout(session, url, http_semaphore):
+    try:
+        content = await fetch(session, url, http_semaphore)
+    except aiohttp.client_exceptions.ClientPayloadError:
+        logger.debug('broken content %s', url)
+        return False
+    return 'Copr timeout => sending INT' in content
+
+
 async def failed_but_built(session, url, http_semaphore):
     """
     Sometimes, the package actually built, but is only marked as failed:
@@ -136,6 +146,10 @@ def index_link(package, build):
 
 def buildlog_link(package, build):
     return index_link(package, build) + 'build.log.gz'
+
+
+def builderlive_link(package, build):
+    return index_link(package, build) + 'builder-live.log.gz'
 
 
 class KojiError (Exception):
@@ -223,6 +237,11 @@ async def process(
         if not bz or bz.status == "CLOSED":
             fg = 'red' if longlog else 'blue'
 
+    if fg == 'red':
+        if await is_timeout(session, builderlive_link(package, build), http_semaphore):
+            message += ' (copr timeut)'
+            fg = 'magenta'
+
     if critpath:
         message += ' \N{FIRE}'
     p(message, fg=fg)
@@ -232,6 +251,7 @@ async def process(
         and (not bz or bz.status == "CLOSED")
         and (content_length > limit)
         and (str(package) not in EXCLUDE)
+        and (fg != 'magenta')
     ):
         if not await failed_but_built(session, index_link(package, build), http_semaphore):
             await open_bz(package, build, status, browser_lock)
