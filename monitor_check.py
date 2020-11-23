@@ -54,6 +54,7 @@ LONG_LOGS = {
     'python-numpydoc': 2700,
     'python-jupyter-client': 2700,
     'python-sklearn-nature-inspired-algorithms': 2300,
+    'python-notebook': 3100,
 }
 
 logger = logging.getLogger('monitor_check')
