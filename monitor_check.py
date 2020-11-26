@@ -39,8 +39,6 @@ EXPLANATION = {
 EXCLUDE = {
     'pyxattr': 'fails in Copr only',
     'mingw-python3': 'pending update to 3.10',
-    'folly': 'wheel tags (cp_310 vs cp310)',
-    'python-xmlsec': 'wheel tags (cp_310 vs cp310)',
 }
 
 # Packages failing for root.log issues with long build.logs
