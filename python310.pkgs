@@ -796,6 +796,8 @@ python-acme
 python-acora
 python-acoustid
 python-actdiag
+python-adafruit-platformdetect
+python-adafruit-pureio
 python-adal
 python-adb
 python-adb-shell
@@ -1771,6 +1773,7 @@ python-jsonref
 python-jsonrpclib
 python-jsonrpc-server
 python-jsonrpcserver
+python-jsons
 python-jsonschema
 python-junit_xml
 python-junitxml
@@ -2829,6 +2832,7 @@ python-stestr
 python-stevedore
 python-stomper
 python-stompest
+python-stone
 python-straight-plugin
 python-streamlink
 python-strict-rfc3339
@@ -3285,6 +3289,7 @@ sigil
 signon-glib
 simple-ccsm
 sip
+sip5
 sipvicious
 slingshot
 slowloris
