@@ -242,7 +242,7 @@ async def process(
 
     if fg == 'red':
         if await is_timeout(session, builderlive_link(package, build), http_semaphore):
-            message += ' (copr timeut)'
+            message += ' (copr timeout)'
             fg = 'magenta'
 
     if critpath:
