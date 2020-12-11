@@ -796,6 +796,8 @@ python-acme
 python-acora
 python-acoustid
 python-actdiag
+python-adafruit-platformdetect
+python-adafruit-pureio
 python-adal
 python-adb
 python-adb-shell
@@ -1289,6 +1291,7 @@ python-django-ajax-selects
 python-django-angular
 python-django-annoying
 python-django-appconf
+python-django-auth-ldap
 python-django-authority
 python-django-cacheops
 python-django-cache-url
@@ -1680,6 +1683,7 @@ python-igor
 python-igraph
 python-imagehash
 python-imagesize
+python-imbalanced-learn
 python-img2pdf
 python-impacket
 python-importmagic
@@ -1771,6 +1775,7 @@ python-jsonref
 python-jsonrpclib
 python-jsonrpc-server
 python-jsonrpcserver
+python-jsons
 python-jsonschema
 python-junit_xml
 python-junitxml
@@ -1860,6 +1865,7 @@ python-logfury
 python-logging-tree
 python-logutils
 python-logzero
+python-losant-rest
 python-lrparsing
 python-luftdaten
 python-lunr
@@ -2384,6 +2390,7 @@ python-pyopencl
 python-pyopengl
 python-pyopenuv
 python-pyoptical
+python-pyotgw
 python-pyotp
 python-pypandoc
 python-pypcapkit
@@ -2829,6 +2836,7 @@ python-stestr
 python-stevedore
 python-stomper
 python-stompest
+python-stone
 python-straight-plugin
 python-streamlink
 python-strict-rfc3339
@@ -3285,6 +3293,7 @@ sigil
 signon-glib
 simple-ccsm
 sip
+sip5
 sipvicious
 slingshot
 slowloris
