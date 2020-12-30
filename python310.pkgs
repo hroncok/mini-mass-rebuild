@@ -648,7 +648,7 @@ pdf-stapler
 percol
 perl-Inline-Python
 persepolis
-petsc4py
+petsc
 pew
 pg_activity
 pgcli
@@ -1291,6 +1291,7 @@ python-django-ajax-selects
 python-django-angular
 python-django-annoying
 python-django-appconf
+python-django-auth-ldap
 python-django-authority
 python-django-cacheops
 python-django-cache-url
@@ -1682,6 +1683,7 @@ python-igor
 python-igraph
 python-imagehash
 python-imagesize
+python-imbalanced-learn
 python-img2pdf
 python-impacket
 python-importmagic
@@ -1863,6 +1865,7 @@ python-logfury
 python-logging-tree
 python-logutils
 python-logzero
+python-losant-rest
 python-lrparsing
 python-luftdaten
 python-lunr
@@ -2112,6 +2115,7 @@ python-optcomplete
 python-orderedmultidict
 python-ordered-set
 python-orderedset
+python-osa
 python-osc-lib
 python-os-client-config
 python-oslo-concurrency
@@ -2374,6 +2378,7 @@ python-pymssql
 python-PyMuPDF
 python-PyMySQL
 python-pynacl
+python-pynest2d
 python-pynetbox
 python-pynetdicom
 python-pyngus
@@ -2387,9 +2392,11 @@ python-pyopencl
 python-pyopengl
 python-pyopenuv
 python-pyoptical
+python-pyotgw
 python-pyotp
 python-pypandoc
 python-pypcapkit
+python-pypck
 python-PyPDF2
 python-Pyped
 python-pyperclip
@@ -2869,6 +2876,7 @@ python-tcxparser
 python-tdlib
 python-tempdir
 python-tempita
+python-templated-dictionary
 python-tempora
 python-tenacity
 python-termcolor
@@ -2886,6 +2894,7 @@ python-test_server
 python-TestSlide
 python-testtools
 python-texext
+python-textdistance
 python-textfsm
 python-textile
 python-textparser
@@ -3082,6 +3091,7 @@ python-wxpython4
 python-x2go
 python-xapp
 python-xarray
+python-xbout
 python-xboxapi
 python-xcffib
 python-xdot
@@ -3218,6 +3228,7 @@ rdiff-backup
 rdkit
 rdma-core
 rdopkg
+realtime-tests
 rebase-helper
 recoll
 rednotebook
@@ -3291,6 +3302,7 @@ simple-ccsm
 sip
 sip5
 sipvicious
+skf
 slingshot
 slowloris
 smbcmp
@@ -3360,6 +3372,7 @@ torbrowser-launcher
 tortoisehg
 totpcgi
 tpm2-pkcs11
+trac
 tracer
 trademgen
 transifex-client
