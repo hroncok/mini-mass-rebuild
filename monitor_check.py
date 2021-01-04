@@ -63,6 +63,7 @@ LONG_LOGS = {
     'python-pytest-steps': 2264,
     'pythran': 2900,
     'python-wtf-peewee': 2400,
+    'oraculum': 2600,
 }
 
 logger = logging.getLogger('monitor_check')
