@@ -604,6 +604,7 @@ onboard
 onionshare
 openbabel
 opencv
+openexr
 OpenImageIO
 OpenIPMI
 OpenLP
@@ -752,6 +753,7 @@ pyppd
 pyproj
 pypykatz
 PyQt4
+PyQt-builder
 pyqtwebengine
 py-radix
 pyscard
@@ -981,7 +983,6 @@ python-blackbird
 python-bleach
 python-blessed
 python-blessings
-python-blindspin
 python-blinker
 python-blivet
 python-blockdiag
@@ -1246,6 +1247,7 @@ python-dbus-client-gen
 python-dbusmock
 python-dbus-python-client-gen
 python-dbus-signature-pyparsing
+python-dcrpm
 python-ddt
 python-deap
 python-debian
@@ -1392,6 +1394,7 @@ python-empy
 python-enchant
 python-engineio
 python-enlighten
+python-enrich
 python-enthought-sphinx-theme
 python-entrypoints
 python-enturclient
@@ -2691,6 +2694,7 @@ python-setuptools-lint
 python-setuptools_scm
 python-setuptools_scm_git_archive
 python-sexpdata
+python-sgmllib3k
 python-sh
 python-shade
 python-shadowsocks
@@ -2849,6 +2853,7 @@ python-structlog
 python-stuf
 python-subarulink
 python-subliminal
+python-subprocess-tee
 python-subvertpy
 python-suds
 python-supersmoother
