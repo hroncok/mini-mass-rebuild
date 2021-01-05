@@ -243,7 +243,7 @@ async def process(
     if (
         browser_lock
         and (not bz or bz.status == "CLOSED")
-        and (content_length > limit)
+        and (content_length > LIMIT)
         and (str(package) not in EXCLUDE)
         and (fg != 'magenta')
     ):
