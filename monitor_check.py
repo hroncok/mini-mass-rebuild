@@ -41,32 +41,6 @@ EXCLUDE = {
     'mingw-python3': 'pending update to 3.10',
 }
 
-# Packages failing for root.log issues with long build.logs
-# Most likely caused by a lot of RPM warnings or %pyproject_buildrequires
-LONG_LOGS = {
-    'pki-core': 1203,
-    'python-black': 2207,
-    'python-chaospy': 1583,
-    'python-copr': 2105,
-    'python-decopatch': 1688,
-    'python-makefun': 1667,
-    'python-pytest-cases': 1719,
-    'python-pytest-harvest': 1802,
-    'python-pytest-steps': 1791,
-    'python-numpydoc': 2700,
-    'python-jupyter-client': 2700,
-    'python-sklearn-nature-inspired-algorithms': 2300,
-    'python-notebook': 3100,
-    'python-pint': 2713,
-    'python-pytest-cases': 2197,
-    'python-pytest-harvest': 2279,
-    'python-pytest-steps': 2264,
-    'pythran': 2900,
-    'python-wtf-peewee': 2400,
-    'oraculum': 2600,
-    'python-botocore': 2500,
-}
-
 logger = logging.getLogger('monitor_check')
 
 
@@ -113,6 +87,15 @@ async def is_cmake(session, url, http_semaphore):
     return make and cmake
 
 
+async def is_blue(session, url, http_semaphore):
+    try:
+        content = await fetch(session, url, http_semaphore)
+    except aiohttp.client_exceptions.ClientPayloadError:
+        logger.debug('broken content %s', url)
+        return False
+    return 'but none of the providers can be installed' in content
+
+
 async def is_timeout(session, url, http_semaphore):
     try:
         content = await fetch(session, url, http_semaphore)
@@ -151,6 +134,10 @@ def index_link(package, build):
 
 def buildlog_link(package, build):
     return index_link(package, build) + 'build.log.gz'
+
+
+def rootlog_link(package, build):
+    return index_link(package, build) + 'root.log.gz'
 
 
 def builderlive_link(package, build):
@@ -223,8 +210,10 @@ async def process(
 
     message = f'{package} failed len={content_length}'
 
-    limit = LONG_LOGS.get(package, 0) * 1.2 or LIMIT
-    longlog = content_length > limit
+    longlog = content_length > LIMIT
+
+    if longlog and await is_blue(session, rootlog_link(package, build), http_semaphore):
+        longlog = False
 
     if blues_file and not longlog:
         print(package, file=blues_file)
