@@ -64,6 +64,7 @@ LONG_LOGS = {
     'pythran': 2900,
     'python-wtf-peewee': 2400,
     'oraculum': 2600,
+    'python-botocore': 2500,
 }
 
 logger = logging.getLogger('monitor_check')
