@@ -48,6 +48,9 @@ for pkg in packages:
                  if build['state'] == 'succeeded'
                  and build['project_dirname'] == copr.partition('/')[-1]]
 
+    if not succeeded:
+        continue
+
     versions = dict((build['id'], drop_dist(build['source_package']['version']))
                     for build in succeeded)
 
