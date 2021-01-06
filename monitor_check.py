@@ -32,7 +32,7 @@ EXPLANATION = {
     'yellow': 'reported',
     'green': 'retired',
     'cyan': 'excluded from bug filing',
-    'magenta': 'copr timeout',
+    'magenta': 'copr timeout or repo 404',
 }
 
 # FTBS packages for which we don't open bugs (yet)
@@ -61,6 +61,10 @@ async def fetch(session, url, http_semaphore, *, json=False):
         logger.debug('fetch %s', url)
         try:
             async with session.get(url) as response:
+                # copr sometimes does not rename the logs
+                if response.status == 404 and url.endswith('.gz'):
+                    url = url[:-3]
+                    return await fetch(session, url, http_semaphore, json=json)
                 if json:
                     return await response.json()
                 return await response.text('utf-8')
@@ -94,6 +98,15 @@ async def is_blue(session, url, http_semaphore):
         logger.debug('broken content %s', url)
         return False
     return 'but none of the providers can be installed' in content
+
+
+async def is_repo_404(session, url, http_semaphore):
+    try:
+        content = await fetch(session, url, http_semaphore)
+    except aiohttp.client_exceptions.ClientPayloadError:
+        logger.debug('broken content %s', url)
+        return False
+    return content.count('Failed to download metadata for repo') >= 3
 
 
 async def is_timeout(session, url, http_semaphore):
@@ -215,13 +228,21 @@ async def process(
     if longlog and await is_blue(session, rootlog_link(package, build), http_semaphore):
         longlog = False
 
+    repo_404 = False
+    if await is_repo_404(session, rootlog_link(package, build), http_semaphore):
+        longlog = True
+        repo_404 = True
+
     if blues_file and not longlog:
         print(package, file=blues_file)
 
+    bz = None
     if package in EXCLUDE:
-        bz = None
         fg = 'cyan'
         message += f' (excluded: {EXCLUDE[package]})'
+    elif repo_404:
+        fg = 'magenta'
+        message += ' (repo 404)'
     else:
         bz = bug(bugs, package)
         if bz:
