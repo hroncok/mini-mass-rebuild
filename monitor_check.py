@@ -48,7 +48,8 @@ def _bugzillas():
     bzapi = bugzilla.Bugzilla(BUGZILLA)
     query = bzapi.build_query(product='Fedora')
     query['blocks'] = TRACKER
-    return sorted(bzapi.query(query), key=lambda b: -b.id)
+    return [b for b in sorted(bzapi.query(query), key=lambda b: -b.id)
+            if b.resolution != 'DUPLICATE']
 
 
 async def bugzillas():
