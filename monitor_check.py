@@ -62,6 +62,7 @@ async def fetch(session, url, http_semaphore, *, json=False):
         try:
             async with session.get(url) as response:
                 # copr sometimes does not rename the logs
+                # https://pagure.io/copr/copr/issue/1648
                 if response.status == 404 and url.endswith('.gz'):
                     url = url[:-3]
                     return await fetch(session, url, http_semaphore, json=json)
