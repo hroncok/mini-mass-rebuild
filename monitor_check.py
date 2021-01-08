@@ -39,6 +39,8 @@ EXPLANATION = {
 EXCLUDE = {
     'pyxattr': 'fails in Copr only',
     'mingw-python3': 'pending update to 3.10',
+    'gdb': 'problem in gcc, bz1912913',
+    'python-uvicorn': 'problem in websockets, bz1914246',
 }
 
 logger = logging.getLogger('monitor_check')
