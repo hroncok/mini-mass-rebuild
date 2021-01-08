@@ -41,6 +41,7 @@ EXCLUDE = {
     'mingw-python3': 'pending update to 3.10',
     'gdb': 'problem in gcc, bz1912913',
     'python-uvicorn': 'problem in websockets, bz1914246',
+    'python-webassets': 'problem in scss, bz1914347',
 }
 
 logger = logging.getLogger('monitor_check')
