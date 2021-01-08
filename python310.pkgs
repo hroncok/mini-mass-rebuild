@@ -390,7 +390,6 @@ koji
 koji-containerbuild
 koji-osbuild
 komikku
-koschei
 krita
 krop
 lammps
@@ -588,6 +587,7 @@ notcurses
 notmuch
 nototools
 nova-agent
+ntpsec
 numpy
 nut
 nvmetcli
@@ -757,7 +757,6 @@ PyQt-builder
 pyqtwebengine
 py-radix
 pyscard
-pysendfile
 pyserial
 pyserial-asyncio
 pyshp
@@ -790,7 +789,6 @@ python3-simpletal
 python3-typed_ast
 python3-zope-fixers
 python-aaargh
-python-abclient
 python-abimap
 python-absl-py
 python-accuweather
@@ -1413,6 +1411,7 @@ python-evdev
 python-eventlet
 python-events
 python-evic
+python-EvoPreprocess
 python-exabgp
 python-execnet
 python-exif
@@ -1713,7 +1712,6 @@ python-ipdb
 python-ipgetter
 python-ipgetter2
 python-ipmi
-python-iptables
 python-iptools
 python-IPy
 python-ipykernel
@@ -1914,7 +1912,6 @@ python-matrix-synapse-ldap3
 python-maxminddb
 python-mccabe
 python-MDAnalysis
-python-mdp
 python-mdx_gh_links
 python-meautility
 python-mechanicalsoup
@@ -2207,7 +2204,6 @@ python-piexif
 python-pifpaf
 python-pigpio
 python-pika
-python-pika-pool
 python-pikepdf
 python-pillow
 python-pingouin
@@ -2917,7 +2913,6 @@ python-tifffile
 python-tilestache
 python-timeout-decorator
 python-timeunit
-python-tinycss
 python-tinycss2
 python-tinydb
 python-tinyrpc
@@ -3436,6 +3431,7 @@ tuna
 tuned
 TurboGears2
 txt2tags
+ubertooth
 udica
 udiskie
 uflash
