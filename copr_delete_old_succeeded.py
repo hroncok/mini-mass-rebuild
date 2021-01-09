@@ -5,6 +5,8 @@ import sys
 
 import rpm
 
+BATCH_SIZE = 1000
+
 copr = sys.argv[1]
 
 
@@ -39,8 +41,8 @@ packages = json.loads(subprocess.check_output(cmd, text=True))
 packages = [p['name'] for p in packages]
 
 
-for pkg in packages:
-    print(f'Checking {pkg}')
+for idx, pkg in enumerate(packages):
+    print(f'Checking {pkg} ({idx+1}/{len(packages)})')
     cmd = f'copr get-package {copr} --with-all-builds --name'.split()
     pkg_detail = json.loads(subprocess.check_output(cmd + [pkg], text=True))
 
@@ -62,12 +64,13 @@ for pkg in packages:
     for buildid, version in versions.items():
         e = rpm.labelCompare(parse_evr(newest_version), parse_evr(version))
         if e in [0, -1]:
-            print(f'Will delete {buildid}, {pkg} {version}')
             to_delete.add(buildid)
+            print(f'Will delete {buildid}, '
+                  f'{pkg} {version} ({len(to_delete)}/{BATCH_SIZE})')
 
     print()
 
-    if len(to_delete) >= 1000:
+    if len(to_delete) >= BATCH_SIZE:
         delete_builds(to_delete)
 
 if to_delete:
