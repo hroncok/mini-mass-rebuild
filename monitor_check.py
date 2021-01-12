@@ -42,6 +42,7 @@ EXCLUDE = {
     'gdb': 'problem in gcc, bz1912913',
     'python-uvicorn': 'problem in websockets, bz1914246',
     'python-webassets': 'problem in scss, bz1914347',
+    'python-mock': 'missing six BuildRequires - https://src.fedoraproject.org/rpms/python-mock/pull-request/7#'
 }
 
 logger = logging.getLogger('monitor_check')
