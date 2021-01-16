@@ -194,6 +194,7 @@ dtc
 duplicity
 dxf2gcode
 dynaconf
+ec2-hibinit-agent
 electron-cash
 electrum
 elements
@@ -2030,6 +2031,7 @@ python-networkx
 python-neurodsp
 python-neurosynth
 python-neutronclient
+python-niaaml
 python-niapy
 python-nibabel
 python-nikola
@@ -2424,6 +2426,7 @@ python-pyrpmmd
 python-pyrsistent
 python-PyRSS2Gen
 python-pyrtlsdr
+python-pysam
 python-pysaml2
 python-pysb
 python-pyscaffold
@@ -2447,6 +2450,7 @@ python-pysrt
 python-pystalk
 python-pystemd
 python-pystray
+python-pyswip
 python-pysword
 python-pytaglib
 python-pytapo
@@ -2687,6 +2691,7 @@ python-setuptools
 python-setuptools_git
 python-setuptools_hg
 python-setuptools-lint
+python-setuptools-rust
 python-setuptools_scm
 python-setuptools_scm_git_archive
 python-sexpdata
