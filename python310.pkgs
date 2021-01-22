@@ -19,6 +19,7 @@ andriller
 androguard
 androwarn
 ansible
+ansible-base
 ansible-bender
 ansible-inventory-grapher
 ansible-lint
@@ -2800,6 +2801,7 @@ python-sphinx-intl
 python-sphinx-issues
 python-sphinx-kr-theme
 python-sphinx-last-updated-by-git
+python-sphinx_lv2_theme
 python-sphinx-math-dollar
 python-sphinx-notfound-page
 python-sphinx-press-theme
