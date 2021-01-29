@@ -179,6 +179,7 @@ dmlite
 dnf
 dnfdaemon
 dnfdragora
+dnf-plugin-cow
 dnf-plugin-diff
 dnf-plugin-ovl
 dnf-plugins-core
@@ -686,6 +687,7 @@ printrun
 ProDy
 proselint
 protobuf
+protontricks
 protonvpn-cli
 prunerepo
 pss
@@ -941,6 +943,7 @@ python-autobahn
 python-Automat
 python-automaton
 python-autopep8
+python-awesomeversion
 python-AWSIoTPythonSDK
 python-azure-sdk
 python-b2sdk
@@ -1564,6 +1567,7 @@ python-gertty
 python-getmac
 python-gettext
 python-gevent
+python-gevent-eventemitter
 python-ghp-import2
 python-giacpy
 python-gilt
@@ -2519,7 +2523,6 @@ python-pytest-xdist
 python-pytest-xprocess
 python-pytile
 python-pytimeparse
-python-pytoml
 python-pytools
 python-pytzdata
 python-pyudev
@@ -2740,6 +2743,7 @@ python-smbpasswd
 python-smi
 python-smmap
 python-snappy
+python-snaptime
 python-sniffio
 python-snipeit
 python-snowballstemmer
@@ -2840,6 +2844,7 @@ python-stdiomask
 python-stdio-mgr
 python-stdlib-list
 python-stdnum
+python-steam
 python-stem
 python-steps
 python-stestr
@@ -3017,6 +3022,7 @@ python-vcrpy
 python-vcstool
 python-vcstools
 python-vcversioner
+python-vdf
 python-velbus
 python-venusian
 python-verboselogs
