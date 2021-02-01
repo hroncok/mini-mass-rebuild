@@ -213,7 +213,7 @@ def p(*args, **kwargs):
 
 async def process(
     session, bugs, package, build, status, http_semaphore, command_semaphore,
-    *, browser_lock=None, blues_file=None
+    *, browser_lock=None, blues_file=None, magentas_file=None
 ):
     if status != 'failed':
         return
@@ -251,6 +251,7 @@ async def process(
     elif repo_404:
         fg = 'magenta'
         message += ' (repo 404)'
+        print(package, file=magentas_file)
     else:
         bz = bug(bugs, package)
         if bz:
@@ -336,7 +337,7 @@ async def gather_or_cancel(*tasks):
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
-async def main(pkgs=None, open_bug_reports=False, blues_file=None):
+async def main(pkgs=None, open_bug_reports=False, blues_file=None, magentas_file=None):
     logging.basicConfig(
         format='%(asctime)s %(name)s %(levelname)s: %(message)s',
         level=LOGLEVEL)
@@ -384,7 +385,7 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None):
                     session, bugs, package, build, status,
                     http_semaphore, command_semaphore,
                     browser_lock=browser_lock,
-                    blues_file=blues_file
+                    blues_file=blues_file, magentas_file=magentas_file
                 )))
 
             if 'Possible build states:' in line:
@@ -416,8 +417,13 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None):
     type=click.File('w'),
     help='Dump blue-ish packages to a given file'
 )
-def run(pkgs, open_bug_reports, blues_file=None):
-    asyncio.run(main(pkgs, open_bug_reports, blues_file))
+@click.option(
+    '--magentas-file',
+    type=click.File('w'),
+    help='Dump magent-ish packages to a given file'
+)
+def run(pkgs, open_bug_reports, blues_file=None, magentas_file=None):
+    asyncio.run(main(pkgs, open_bug_reports, blues_file, magentas_file))
 
 if __name__ == '__main__':
     run()
