@@ -259,6 +259,7 @@ GeographicLib
 gerrymander
 getdp
 gfal2-python
+gfal2-util
 ginga
 git-archive-all
 git-cola
@@ -2351,9 +2352,9 @@ python-pyi2cflash
 python-pyinels
 python-pyinsane2
 python-pyiqvia
-python-pykafka
 python-pykdtree
 python-pykeepass
+python-pykmip
 python-pykwalify
 python-pylatex
 python-PyLEMS
@@ -2740,6 +2741,7 @@ python-smart-gardena
 python-smartypants
 python-smbc
 python-smbpasswd
+python-smbprotocol
 python-smi
 python-smmap
 python-snappy
@@ -3160,6 +3162,7 @@ python-XStatic-termjs
 python-xtermcolor
 python-xunitparser
 python-xvfbwrapper
+python-yaml2ical
 python-yamlordereddictloader
 python-yapf
 python-yappi
@@ -3277,6 +3280,7 @@ rrdtool
 rss2email
 rst2pdf
 rst2txt
+rteval
 rtlsdr-scanner
 rubber
 rust-packaging
@@ -3480,6 +3484,7 @@ virt-who
 visidata
 vit
 ViTables
+volk
 volume_key
 vtk
 wad
