@@ -15,7 +15,7 @@ from collections import Counter
 
 MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.10/monitor/'
 INDEX = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
-PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=master&global_component={package}'
+PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=rawhide&global_component={package}'
 PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.10/package/([^/]+)/">')
 BUILD = re.compile(r'<a href="/coprs/g/python/python3.10/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
