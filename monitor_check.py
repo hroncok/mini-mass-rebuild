@@ -280,7 +280,8 @@ async def process(
     elif repo_404:
         fg = 'magenta'
         message += ' (repo 404)'
-        print(package, file=magentas_file)
+        if magentas_file:
+            print(package, file=magentas_file)
     else:
         bz = bug(bugs, package)
         if bz:
