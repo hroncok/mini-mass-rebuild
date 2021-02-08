@@ -126,6 +126,35 @@ async def is_timeout(session, url, http_semaphore):
     return 'Copr timeout => sending INT' in content
 
 
+async def guess_reason(session, url, http_semaphore):
+    try:
+        content = await fetch(session, url, http_semaphore)
+    except aiohttp.client_exceptions.ClientPayloadError:
+        logger.debug('broken content %s', url)
+        return False
+    reasons = [
+        "ImportError: cannot import name 'Iterable' from 'collections'",
+    ]
+    for reason in reasons:
+        if reason in content:
+            return {
+                "short_desc": ": ImportError: cannot import name 'Iterable' from 'collections'",
+                "long_desc": """
+        ImportError: cannot import name 'Iterable' from 'collections'
+        (/usr/lib64/python3.10/collections/__init__.py)
+
+        bpo-37324: Remove deprecated aliases to Collections Abstract Base Classes
+        from the collections module.
+
+        https://docs.python.org/3.10/whatsnew/changelog.html#python-3-10-0-alpha-5
+        """,
+            }
+    return {
+        "short_desc": "",
+        "long_desc": "",
+    }
+
+
 async def failed_but_built(session, url, http_semaphore):
     """
     Sometimes, the package actually built, but is only marked as failed:
@@ -213,7 +242,7 @@ def p(*args, **kwargs):
 
 async def process(
     session, bugs, package, build, status, http_semaphore, command_semaphore,
-    *, browser_lock=None, blues_file=None, magentas_file=None
+    *, browser_lock=None, with_reason=None, blues_file=None, magentas_file=None
 ):
     if status != 'failed':
         return
@@ -278,17 +307,20 @@ async def process(
         and (fg != 'magenta')
     ):
         if not await failed_but_built(session, index_link(package, build), http_semaphore):
-            await open_bz(package, build, status, browser_lock)
+            reason = await guess_reason(session, builderlive_link(package, build), http_semaphore)
+            if with_reason and reason['short_desc'] == None:
+                return
+            await open_bz(package, build, status, browser_lock, reason)
 
 
-async def open_bz(package, build, status, browser_lock):
-    summary = f"{package} fails to build with Python 3.10"
+async def open_bz(package, build, status, browser_lock, reason=None):
+    summary = f"{package} fails to build with Python 3.10{reason['short_desc']}"
 
     description = dedent(f"""
         {package} fails to build with Python 3.10.0a5.
 
         This report is automated and not very verbose, but we'll try to get back here with details.
-
+        {reason['long_desc']}
         For the build logs, see:
         https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08}-{package}/
 
@@ -337,7 +369,7 @@ async def gather_or_cancel(*tasks):
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
-async def main(pkgs=None, open_bug_reports=False, blues_file=None, magentas_file=None):
+async def main(pkgs=None, open_bug_reports=False, with_reason=False, blues_file=None, magentas_file=None):
     logging.basicConfig(
         format='%(asctime)s %(name)s %(levelname)s: %(message)s',
         level=LOGLEVEL)
@@ -384,7 +416,7 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None, magentas_file
                 jobs.append(asyncio.ensure_future(process(
                     session, bugs, package, build, status,
                     http_semaphore, command_semaphore,
-                    browser_lock=browser_lock,
+                    browser_lock=browser_lock, with_reason=with_reason,
                     blues_file=blues_file, magentas_file=magentas_file
                 )))
 
@@ -413,6 +445,11 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None, magentas_file
         + 'package that seems to need a bug report'
 )
 @click.option(
+    '--with-reason/--without-reason',
+    help='Use in combination with "--open-bug-reports",'
+        + 'to open bug if reason was guessed'
+)
+@click.option(
     '--blues-file',
     type=click.File('w'),
     help='Dump blue-ish packages to a given file'
@@ -422,8 +459,8 @@ async def main(pkgs=None, open_bug_reports=False, blues_file=None, magentas_file
     type=click.File('w'),
     help='Dump magent-ish packages to a given file'
 )
-def run(pkgs, open_bug_reports, blues_file=None, magentas_file=None):
-    asyncio.run(main(pkgs, open_bug_reports, blues_file, magentas_file))
+def run(pkgs, open_bug_reports, with_reason=None, blues_file=None, magentas_file=None):
+    asyncio.run(main(pkgs, open_bug_reports, with_reason, blues_file, magentas_file))
 
 if __name__ == '__main__':
     run()
