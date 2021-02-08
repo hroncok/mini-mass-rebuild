@@ -87,6 +87,26 @@ EXCLUDE = {
     'xapps': 'meson',
 }
 
+REASONS = {
+    "collections.abc": {
+        "regex": r"(ImportError: cannot import name '(.*?)' from 'collections'|AttributeError: module 'collections' has no attribute '(.*?)')",
+        # no short_description, uses the matched regex
+        "long_description":
+        """{MATCH}
+        (/usr/lib64/python3.10/collections/__init__.py)
+
+        The deprecated aliases to Collections Abstract Base Classes were removed from the collections module.
+        https://docs.python.org/3.10/whatsnew/changelog.html#python-3-10-0-alpha-5
+        https://bugs.python.org/issue37324""",
+    },
+    "segfault": {
+        # Segfault detection is quite noisy, especially if we do not want to report it this way. I temporarily disabled it with X in regex.
+        "regex": r"XSegmentation fault",
+        "long_description": """ DO NOT REPORT THIS """,
+        "short_description": """ DO NOT REPORT THIS """,
+    },
+}
+
 logger = logging.getLogger('monitor_check')
 
 
@@ -172,30 +192,14 @@ async def guess_reason(session, url, http_semaphore):
     except aiohttp.client_exceptions.ClientPayloadError:
         logger.debug('broken content %s', url)
         return False
-    reasons = [
-        "ImportError: cannot import name '(.*?)' from 'collections'",
-    ]
-    for reason in reasons:
-        #if reason in content:
-        match = re.search(rf"{reason}", content)
+    for reason in REASONS.values():
+        match = re.search(reason["regex"], content)
         if match:
             return {
-                "short_desc": f"{match.group()}",
-                "long_desc": f"""
-        {match.group()}
-        (/usr/lib64/python3.10/collections/__init__.py)
-
-        bpo-37324: Remove deprecated aliases to Collections Abstract Base Classes
-        from the collections module.
-
-        https://docs.python.org/3.10/whatsnew/changelog.html#python-3-10-0-alpha-5
-        """,
+                "long_description": reason["long_description"].format(MATCH=match.group()),
+                "short_description": reason.get("short_description") or match.group(),
             }
-    return {
-        "short_desc": "",
-        "long_desc": "",
-    }
-
+    return None
 
 async def failed_but_built(session, url, http_semaphore):
     """
@@ -351,19 +355,25 @@ async def process(
     ):
         if not await failed_but_built(session, index_link(package, build), http_semaphore):
             reason = await guess_reason(session, builderlive_link(package, build), http_semaphore)
-            if with_reason and reason['short_desc'] == '':
+            if with_reason and not reason:
                 return
             await open_bz(package, build, status, browser_lock, reason)
 
 
 async def open_bz(package, build, status, browser_lock, reason=None):
-    summary = f"{package} fails to build with Python 3.10{reason['short_desc']}"
+    if reason == None:
+        # General message for packages opened with --without-reason
+        reason = {
+            "long_description": "This report is automated and not very verbose, but we'll try to get back here with details.",
+            "short_description": "",
+        }
+    summary = f"{package} fails to build with Python 3.10: {reason['short_description']}"
 
     description = dedent(f"""
         {package} fails to build with Python 3.10.0a5.
 
-        This report is automated and not very verbose, but we'll try to get back here with details.
-        {reason['long_desc']}
+        {reason['long_description']}
+
         For the build logs, see:
         https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08}-{package}/
 
