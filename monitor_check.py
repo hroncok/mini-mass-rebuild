@@ -133,14 +133,16 @@ async def guess_reason(session, url, http_semaphore):
         logger.debug('broken content %s', url)
         return False
     reasons = [
-        "ImportError: cannot import name 'Iterable' from 'collections'",
+        "ImportError: cannot import name '(.*?)' from 'collections'",
     ]
     for reason in reasons:
-        if reason in content:
+        #if reason in content:
+        match = re.search(rf"{reason}", content)
+        if match:
             return {
-                "short_desc": ": ImportError: cannot import name 'Iterable' from 'collections'",
-                "long_desc": """
-        ImportError: cannot import name 'Iterable' from 'collections'
+                "short_desc": f"{match.group()}",
+                "long_desc": f"""
+        {match.group()}
         (/usr/lib64/python3.10/collections/__init__.py)
 
         bpo-37324: Remove deprecated aliases to Collections Abstract Base Classes
