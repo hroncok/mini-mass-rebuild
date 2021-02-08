@@ -308,7 +308,7 @@ async def process(
     ):
         if not await failed_but_built(session, index_link(package, build), http_semaphore):
             reason = await guess_reason(session, builderlive_link(package, build), http_semaphore)
-            if with_reason and reason['short_desc'] == None:
+            if with_reason and reason['short_desc'] == '':
                 return
             await open_bz(package, build, status, browser_lock, reason)
 
