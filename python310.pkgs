@@ -1691,6 +1691,7 @@ python-ifcfg
 python-igor
 python-igraph
 python-imagehash
+python-imageio
 python-imagesize
 python-imbalanced-learn
 python-img2pdf
@@ -2390,6 +2391,7 @@ python-pynetbox
 python-pynetdicom
 python-pyngus
 python-pynlpl
+python-pynn
 python-pynuvo
 python-pynwb
 python-pyobd
@@ -2814,6 +2816,7 @@ python-sphinx-press-theme
 python-sphinx-removed-in
 python-sphinx_rtd_theme
 python-sphinx_selective_exclude
+python-sphinx-tabs
 python-sphinxtesters
 python-sphinx-testing
 python-sphinx-theme-alabaster
@@ -3089,6 +3092,7 @@ python-wikitcms
 python-winacl
 python-winrm
 python-winsspi
+python-wled
 python-wloc
 python-wrapt
 python-ws4py
