@@ -342,6 +342,7 @@ hokuyoaist
 holland
 home-assistant-cli
 hplip
+hpx
 httpie
 hugin
 hydrapaper
@@ -566,6 +567,7 @@ nbdkit
 needrestart
 nemo-extensions
 nest
+netbox
 netcdf4-python
 netgen-mesher
 net-snmp
@@ -956,6 +958,7 @@ python-baluhn
 python-barbicanclient
 python-basemap
 python-bashate
+python-batalgorithm
 python-batinfo
 python-bcrypt
 python-beaker
@@ -1187,7 +1190,6 @@ python-cornice
 python-cornice-sphinx
 python-coronavirus
 python-cotyledon
-python-couchbase
 python-cov-core
 python-coverage
 python-coverage_pth
@@ -1315,7 +1317,6 @@ python-django-filter
 python-django-formtools
 python-django-haystack
 python-django-health-check
-python-django-helpdesk
 python-django-ipware
 python-django-js-asset
 python-django-macros
@@ -1918,6 +1919,7 @@ python-matplotlib-scalebar
 python-matrix-nio
 python-matrix-synapse-ldap3
 python-maxminddb
+python-maya
 python-mccabe
 python-MDAnalysis
 python-mdx_gh_links
@@ -2245,7 +2247,6 @@ python-polib
 python-policyuniverse
 python-portalocker
 python-portend
-python-positional
 python-posix_ipc
 python-power
 python-poyo
@@ -2253,6 +2254,7 @@ python-pplpy
 python-praw
 python-prawcore
 python-precis_i18n
+python-prefixed
 python-pretend
 python-prettyprinter
 python-prettytable
@@ -2649,6 +2651,7 @@ python-rsdclient
 python-rsd-lib
 python-rstcheck
 python-rst-linker
+python-rstr
 python-rtmidi
 python-Rtree
 python-rtslib
@@ -2933,6 +2936,7 @@ python-timeunit
 python-tinycss2
 python-tinydb
 python-tinyrpc
+python-tkrzw
 python-tld
 python-tldextract
 python-tmuxp
@@ -3149,7 +3153,6 @@ python-XStatic-Jasmine
 python-XStatic-JQuery-Migrate
 python-XStatic-JQuery-quicksearch
 python-XStatic-JQuery-TableSorter
-python-XStatic-jquery-ui
 python-XStatic-JSEncrypt
 python-XStatic-Json2yaml
 python-XStatic-JS-Yaml
@@ -3256,6 +3259,7 @@ redshift
 regindexer
 relval
 renderdoc
+reprotest
 resalloc
 resalloc-openstack
 restview
