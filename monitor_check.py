@@ -12,6 +12,8 @@ import click
 from click import secho
 from collections import Counter
 
+import dnf
+from anytree import Node, RenderTree, findall_by_attr
 
 MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.10/monitor/'
 INDEX = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
@@ -25,6 +27,9 @@ LIMIT = 1200
 BUGZILLA = 'bugzilla.redhat.com'
 TRACKER = 1890881  # PYTHON3.10
 LOGLEVEL = logging.WARNING
+
+DNF_CACHEDIR = '_dnf_cache_dir'
+ARCH = 'x86_64'
 
 EXPLANATION = {
     'red': 'probably FTBFS',
@@ -201,6 +206,55 @@ async def guess_reason(session, url, http_semaphore):
             }
     return None
 
+async def guess_missing_dependency(session, package, build, http_semaphore):
+    url = builderlive_link(package, build)
+    try:
+        content = await fetch(session, url, http_semaphore)
+    except aiohttp.client_exceptions.ClientPayloadError:
+        logger.debug('broken content %s', url)
+        return False
+    match = re.search(r"Problem: package (.*?) requires", content)
+    if match:
+        pkg = source_name(match.group(1))
+        if pkg not in missing_dependencies:
+            missing_dependencies[pkg] = []
+            missing_dependencies[pkg].append(package)
+        else:
+            if package not in missing_dependencies[pkg]:
+                missing_dependencies[pkg].append(package)
+    else:
+        missing_dependencies['match_failed'].append(package)
+
+def print_dependency_tree():
+    root = Node("/")
+
+    for k, v in missing_dependencies.items():
+        # insert keys as root children if they are not alredy in tree
+        if len(findall_by_attr(root,k)) == 0:
+            Node(k, parent=root)
+
+        for child in v:
+            # get parent
+            existing_parent = findall_by_attr(root, k)
+            # add child
+            Node(child, parent=existing_parent[0])
+            # get all childs with same name
+            existing_child = findall_by_attr(root, child)
+            # there never should be more than 2 of them
+            if len(existing_child) > 1:
+                # assign new parent to the older child (one with whole dependency tree)
+                existing_child[0].parent=existing_parent[0]
+                # remove the other duplicate child
+                existing_child[1].parent=None
+
+    for pre, _, node in RenderTree(root):
+        print(f"{pre}{node.name}")
+
+    most_common = Counter({k: len(v) for k, v in missing_dependencies.items()}).most_common(10)
+    print("Top 10 of blockers (match_failed contains packages that could not be parsed):", file=sys.stderr)
+    for pkg, count in most_common:
+        print(pkg + ": " + str(count), file=sys.stderr)
+
 async def failed_but_built(session, url, http_semaphore):
     """
     Sometimes, the package actually built, but is only marked as failed:
@@ -279,6 +333,33 @@ def bug(bugs, package):
 
 counter = Counter()
 
+def pkgname(nevra):
+    return nevra.rsplit("-", 2)[0]
+
+def source_name(nevra):
+    pkgs = repoquery(pkgname(nevra))
+    for pkg in pkgs:  # a only gets evaluated here
+    #    if pkg.reponame == "fedorarawhide":
+        return pkg.source_name
+    raise RuntimeError(f"Cannot find source for {name}. Hint: Remove the cache in {DNF_CACHEDIR}")
+
+def rawhide_sack():
+    """A DNF sack for rawhide, used for queries, cached"""
+    base = dnf.Base()
+    conf = base.conf
+    conf.cachedir = DNF_CACHEDIR
+    conf.substitutions['basearch'] = ARCH
+    base.repos.add_new_repo('rawhide', conf,
+        baseurl=['http://kojipkgs.fedoraproject.org/repos/rawhide/latest/$basearch/'],
+        skip_if_unavailable=False,
+        enabled=True)
+    base.fill_sack(load_system_repo=False, load_available_repos=True)
+    return base.sack
+
+RAWHIDE_SACK = rawhide_sack()
+
+def repoquery(name):
+    return RAWHIDE_SACK.query().filter(name=name, latest=1).run()
 
 def p(*args, **kwargs):
     if 'fg' in kwargs:
@@ -318,6 +399,7 @@ async def process(
 
     if blues_file and not longlog:
         print(package, file=blues_file)
+        await guess_missing_dependency(session, package, build, http_semaphore)
 
     bz = None
     if package in EXCLUDE:
@@ -421,8 +503,11 @@ async def gather_or_cancel(*tasks):
                 t.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
 
+missing_dependencies = {
+    'match_failed': []
+}
 
-async def main(pkgs=None, open_bug_reports=False, with_reason=False, blues_file=None, magentas_file=None):
+async def main(pkgs=None, open_bug_reports=False, with_reason=False, blues_file=None, magentas_file=None, dependency_tree=None):
     logging.basicConfig(
         format='%(asctime)s %(name)s %(levelname)s: %(message)s',
         level=LOGLEVEL)
@@ -486,6 +571,8 @@ async def main(pkgs=None, open_bug_reports=False, with_reason=False, blues_file=
             p(f'There are {count} {fg} lines ({EXPLANATION[fg]})',
               file=sys.stderr, fg=fg)
 
+        if dependency_tree:
+            print_dependency_tree()
 
 @click.command()
 @click.argument(
@@ -512,8 +599,12 @@ async def main(pkgs=None, open_bug_reports=False, with_reason=False, blues_file=
     type=click.File('w'),
     help='Dump magent-ish packages to a given file'
 )
-def run(pkgs, open_bug_reports, with_reason=None, blues_file=None, magentas_file=None):
-    asyncio.run(main(pkgs, open_bug_reports, with_reason, blues_file, magentas_file))
+@click.option(
+    '--dependency-tree/--no-dependency-tree',
+    help='Show dependency tree of blue packages'
+)
+def run(pkgs, open_bug_reports, with_reason=None, blues_file=None, magentas_file=None, dependency_tree=None):
+    asyncio.run(main(pkgs, open_bug_reports, with_reason, blues_file, magentas_file, dependency_tree))
 
 if __name__ == '__main__':
     run()
