@@ -55,7 +55,7 @@ class SortableEVR:
 def removed_pkgs():
     name_versions = defaultdict(set)
     old_name_evrs = old_pkgs()
-    new = set(repoquery(all=True, qf='%{NAME}'))
+    new = set(repoquery(all=True, qf='%{NAME}', version=34))
     for name_evr in old_name_evrs:
         name, _, evr = name_evr.partition(' ')
         if name not in new:
@@ -84,7 +84,11 @@ def bump_release(evr):
         if part == '0':
             release.append(part)
         else:
-            release.append(str(int(part) + 1))
+            try:
+                release.append(str(int(part) + 1))
+            except ValueError:
+                release.append(part)
+                release.append("MANUAL")
             release = '.'.join(release)
             return f'{ev}-{release}'
     else:
@@ -99,7 +103,7 @@ def format_obsolete(pkg, evr):
 rp = removed_pkgs()
 for pkg in sorted(rp):
     version = drop_0epoch(drop_dist(rp[pkg]))
-    whatobsoletes = repoquery(whatobsoletes=f'{pkg} = {version}', qf='%{NAME}')
+    whatobsoletes = repoquery(whatobsoletes=f'{pkg} = {version}', qf='%{NAME}', version=34)
     if not whatobsoletes or whatobsoletes == ['fedora-obsolete-packages']:
         print(format_obsolete(pkg, version))
     else:
