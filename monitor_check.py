@@ -13,7 +13,7 @@ from click import secho
 from collections import Counter
 
 import dnf
-from anytree import Node, RenderTree, findall_by_attr
+from anytree import Node, RenderTree, findall_by_attr, LoopError
 
 MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.10/monitor/'
 INDEX = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
@@ -213,15 +213,16 @@ async def guess_missing_dependency(session, package, build, http_semaphore):
     except aiohttp.client_exceptions.ClientPayloadError:
         logger.debug('broken content %s', url)
         return False
-    match = re.search(r"Problem: package (.*?) requires", content)
+    match = re.findall(r"Problem.*?: package (.*?) requires", content)
     if match:
-        pkg = source_name(match.group(1))
-        if pkg not in missing_dependencies:
-            missing_dependencies[pkg] = []
-            missing_dependencies[pkg].append(package)
-        else:
-            if package not in missing_dependencies[pkg]:
-                missing_dependencies[pkg].append(package)
+        for broken_pkg in match:
+            broken_srpm = source_name(broken_pkg)
+            if broken_srpm not in missing_dependencies:
+                missing_dependencies[broken_srpm] = []
+                missing_dependencies[broken_srpm].append(package)
+            else:
+                if package not in missing_dependencies[broken_srpm]:
+                    missing_dependencies[broken_srpm].append(package)
     else:
         missing_dependencies['match_failed'].append(package)
 
@@ -242,8 +243,12 @@ def print_dependency_tree():
             existing_child = findall_by_attr(root, child)
             # there never should be more than 2 of them
             if len(existing_child) > 1:
-                # assign new parent to the older child (one with whole dependency tree)
-                existing_child[0].parent=existing_parent[0]
+                try:
+                    # assign new parent to the older child (one with whole dependency tree)
+                    existing_child[0].parent=existing_parent[0]
+                except LoopError as e:
+                    print("Possible circular dependency.", file=sys.stderr)
+                    print(str(e), file=sys.stderr)
                 # remove the other duplicate child
                 existing_child[1].parent=None
 
@@ -341,7 +346,7 @@ def source_name(nevra):
     for pkg in pkgs:  # a only gets evaluated here
     #    if pkg.reponame == "fedorarawhide":
         return pkg.source_name
-    raise RuntimeError(f"Cannot find source for {name}. Hint: Remove the cache in {DNF_CACHEDIR}")
+    raise RuntimeError(f"Cannot find source for {pkgname(nevra)}. Hint: Remove the cache in {DNF_CACHEDIR}")
 
 def rawhide_sack():
     """A DNF sack for rawhide, used for queries, cached"""
@@ -399,7 +404,6 @@ async def process(
 
     if blues_file and not longlog:
         print(package, file=blues_file)
-        await guess_missing_dependency(session, package, build, http_semaphore)
 
     bz = None
     if package in EXCLUDE:
@@ -418,6 +422,11 @@ async def process(
 
         if not bz or bz.status == "CLOSED":
             fg = 'red' if longlog else 'blue'
+            if longlog:
+                fg = 'red'
+            else:
+                fg = 'blue'
+                await guess_missing_dependency(session, package, build, http_semaphore)
 
     if fg == 'red':
         if await is_timeout(session, builderlive_link(package, build), http_semaphore):
