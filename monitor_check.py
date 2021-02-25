@@ -404,7 +404,6 @@ async def process(
 
     if blues_file and not longlog:
         print(package, file=blues_file)
-        await guess_missing_dependency(session, package, build, http_semaphore)
 
     bz = None
     if package in EXCLUDE:
@@ -423,6 +422,11 @@ async def process(
 
         if not bz or bz.status == "CLOSED":
             fg = 'red' if longlog else 'blue'
+            if longlog:
+                fg = 'red'
+            else:
+                fg = 'blue'
+                await guess_missing_dependency(session, package, build, http_semaphore)
 
     if fg == 'red':
         if await is_timeout(session, builderlive_link(package, build), http_semaphore):
