@@ -48,7 +48,6 @@ EXCLUDE = {
     'clang': 'problem in gcc, bz1915437',
     'python-uvicorn': 'problem in websockets, bz1914246',
     'python-webassets': 'problem in scss, bz1914347',
-    'python-mock': 'missing six BuildRequires - https://src.fedoraproject.org/rpms/python-mock/pull-request/7#',
     'copr-backend': 'problem in setproctitle, bz1919789',
 }
 
