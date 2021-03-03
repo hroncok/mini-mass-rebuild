@@ -521,7 +521,7 @@ async def main(pkgs=None, open_bug_reports=False, with_reason=False, blues_file=
     else:
         browser_lock = None
 
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers={"Connection": "close"}) as session:
         # we could stream the content, but meh, get it all, it's not that long
         monitor = fetch(session, MONITOR, http_semaphore)
         bugs = bugzillas()
