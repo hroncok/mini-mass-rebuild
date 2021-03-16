@@ -245,6 +245,8 @@ async def is_retired(package, command_semaphore):
 
 
 async def is_critpath(session, package, http_semaphore):
+    return False  # XXX
+    
     try:
         json = await fetch(session, PDC.format(package=quote(package)), http_semaphore, json=True)
         for result in json['results']:
@@ -307,11 +309,11 @@ async def process(
     if status != 'failed':
         return
 
-    retired = await is_retired(package, command_semaphore)
-
-    if retired:
-        p(f'{package} is retired', fg='green')
-        return
+    #retired = await is_retired(package, command_semaphore)
+    #
+    #if retired:
+    #    p(f'{package} is retired', fg='green')
+    #    return
 
     content_length, critpath = await gather_or_cancel(
         length(session, buildlog_link(package, build), http_semaphore),
@@ -369,7 +371,7 @@ async def process(
         and (fg != 'magenta')
     ):
         if not await failed_but_built(session, index_link(package, build), http_semaphore):
-            reason = await guess_reason(session, builderlive_link(package, build), http_semaphore)
+            reason = await guess_reason(session, buildlog_link(package, build), http_semaphore)
             if with_reason and not reason:
                 return
             print(package, reason["short_description"], file=sys.stderr)
