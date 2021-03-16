@@ -15,17 +15,17 @@ from collections import Counter
 import dnf
 from anytree import Node, RenderTree, findall_by_attr
 
-MONITOR = 'https://copr.fedorainfracloud.org/coprs/g/python/python3.10/monitor/'
-INDEX = 'https://copr-be.cloud.fedoraproject.org/results/@python/python3.10/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
+MONITOR = 'https://copr.fedorainfracloud.org/coprs/cstratak/rpath/monitor/'
+INDEX = 'https://copr-be.cloud.fedoraproject.org/results/cstratak/rpath/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
 PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=rawhide&global_component={package}'
-PACKAGE = re.compile(r'<a href="/coprs/g/python/python3.10/package/([^/]+)/">')
-BUILD = re.compile(r'<a href="/coprs/g/python/python3.10/build/([^/]+)/">')
+PACKAGE = re.compile(r'<a href="/coprs/cstratak/rpath/package/([^/]+)/">')
+BUILD = re.compile(r'<a href="/coprs/cstratak/rpath/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
 RPM_FILE = "<td class='t'>RPM File</td>"
-TAG = 'f34'
+TAG = 'f35'
 LIMIT = 1200
 BUGZILLA = 'bugzilla.redhat.com'
-TRACKER = 1890881  # PYTHON3.10
+TRACKER = 1927309  # F35FTBFS
 LOGLEVEL = logging.WARNING
 
 DNF_CACHEDIR = '_dnf_cache_dir'
@@ -43,72 +43,16 @@ EXPLANATION = {
 # FTBS packages for which we don't open bugs (yet)
 EXCLUDE = {
     'pyxattr': 'fails in Copr only',
-    'mingw-python3': 'pending update to 3.10',
-    'gdb': 'problem in gcc, bz1912913',
-    'clang': 'problem in gcc, bz1915437',
-    'python-uvicorn': 'problem in websockets, bz1914246',
-    'python-webassets': 'problem in scss, bz1914347',
-    'python-mock': 'missing six BuildRequires - https://src.fedoraproject.org/rpms/python-mock/pull-request/7#',
-    'copr-backend': 'problem in setproctitle, bz1919789',
-    # meson, https://bugs.python.org/issue43162
-    'apostrophe': 'meson',
-    'cozy': 'meson',
-    'd-feet': 'meson',
-    'gedit': 'meson',
-    'gitg': 'meson',
-    'glade': 'meson',
-    'gnome-abrt': 'meson',
-    'gnome-builder': 'meson',
-    'gnome-feeds': 'meson',
-    'gnome-music': 'meson',
-    'gnome-passwordsafe': 'meson',
-    'gnome-tweaks': 'meson',
-    'gobject-introspection': 'meson',
-    'gom': 'meson',
-    'gplugin': 'meson',
-    'gst': 'meson',
-    'gst-editing-services': 'meson',
-    'gwe': 'meson',
-    'hexchat': 'meson',
-    'hydrapaper': 'meson',
-    'komikku': 'meson',
-    'libaccounts-glib': 'meson',
-    'libgexiv2': 'meson',
-    'libgit2-glib': 'meson',
-    'libmodulemd': 'meson',
-    'libpeas': 'meson',
-    'lollypop': 'meson',
-    'meld': 'meson',
-    'nemo-extensions': 'meson',
-    'piper': 'meson',
-    'pitivi': 'meson',
-    'pygobject3': 'meson',
-    'python-gstreamer1': 'meson',
-    'retrace-server': 'meson',
-    'revelation': 'meson',
-    'setzer': 'meson',
-    'signon-glib': 'meson',
-    'theme-switcher': 'meson',
-    'xapps': 'meson',
 }
 
 REASONS = {
-    "collections.abc": {
-        "regex": r"(ImportError: cannot import name '(.*?)' from 'collections'|AttributeError: module 'collections' has no attribute '(.*?)')",
+    "rpath": {
+        "regex": r".+contains an invalid rpath.+",
         # no short_description, uses the matched regex
         "long_description":
         """{MATCH}
-        (/usr/lib64/python3.10/collections/__init__.py)
 
-        The deprecated aliases to Collections Abstract Base Classes were removed from the collections module.
-        https://docs.python.org/3.10/whatsnew/changelog.html#python-3-10-0-alpha-5
-        https://bugs.python.org/issue37324""",
-    },
-    "segfault": {
-        # Segfault detection is quite noisy, especially if we do not want to report it this way. I temporarily disabled it with X in regex.
-        "regex": r"XSegmentation fault",
-        "long_description": """ DO NOT REPORT THIS """,
-        "short_description": """ DO NOT REPORT THIS """,
+        ...more info...""",
     },
 }
 
@@ -151,17 +95,6 @@ async def length(session, url, http_semaphore):
         logger.debug('length %s', url)
         async with session.head(url) as response:
             return int(response.headers.get('content-length'))
-
-
-async def is_cmake(session, url, http_semaphore):
-    try:
-        content = await fetch(session, url, http_semaphore)
-    except aiohttp.client_exceptions.ClientPayloadError:
-        logger.debug('broken content %s', url)
-        return False
-    make = 'No targets specified and no makefile found.' in content
-    cmake = '/usr/bin/cmake' in content
-    return make and cmake
 
 
 async def is_blue(session, url, http_semaphore):
@@ -439,7 +372,8 @@ async def process(
             reason = await guess_reason(session, builderlive_link(package, build), http_semaphore)
             if with_reason and not reason:
                 return
-            await open_bz(package, build, status, browser_lock, reason)
+            print(package, reason["short_description"], file=sys.stderr)
+            # open_bz(package, build, status, browser_lock, reason)
 
 
 async def open_bz(package, build, status, browser_lock, reason=None):
