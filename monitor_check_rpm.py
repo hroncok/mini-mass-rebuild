@@ -15,7 +15,7 @@ from collections import Counter
 
 MONITOR = 'https://copr.fedorainfracloud.org/coprs/churchyard/rpm-exclude-change/monitor/'
 INDEX = 'https://copr-be.cloud.fedoraproject.org/results/churchyard/rpm-exclude-change/fedora-rawhide-x86_64/{build:08d}-{package}/'  # keep the slash
-PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=master&global_component={package}'
+PDC = 'https://pdc.fedoraproject.org/rest_api/v1/component-branches/?name=rawhide&global_component={package}'
 PACKAGE = re.compile(r'<a href="/coprs/churchyard/rpm-exclude-change/package/([^/]+)/">')
 BUILD = re.compile(r'<a href="/coprs/churchyard/rpm-exclude-change/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
