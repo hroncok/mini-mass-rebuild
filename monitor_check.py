@@ -54,6 +54,7 @@ EXPLANATION = {
 EXCLUDE = {
     "python-apsw": "version is set by the set of if-clauses in the spec",
     "python-boto3": "built together with botocore, always fails at the first run",
+    "python-pexpect": "very flaky",
 }
 
 REASONS = {
