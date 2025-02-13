@@ -118,6 +118,23 @@ REASONS = {
          """,
         "short_description": "",
     },
+    "set_event_loop": {
+        "regex": r"DeprecationWarning: 'asyncio.(.*)' is deprecated and slated for removal in Python 3.16",
+        "long_description": """
+        According to https://docs.python.org/dev/whatsnew/3.14.html#id3
+
+        asyncio policy system is deprecated and will be removed in Python 3.16. In particular, the following classes and functions are deprecated:
+        asyncio.AbstractEventLoopPolicy
+        asyncio.DefaultEventLoopPolicy
+        asyncio.WindowsSelectorEventLoopPolicy
+        asyncio.WindowsProactorEventLoopPolicy
+        asyncio.get_event_loop_policy()
+        asyncio.set_event_loop_policy()
+        asyncio.set_event_loop()
+        Users should use asyncio.run() or asyncio.Runner with loop_factory to use the desired event loop implementation.)
+        """,
+        "short_description": "",
+    },
     "segfault": {
         # Segfault detection is quite noisy, especially if we do not want to report it this way. I temporarily disabled it with X in regex.
         "regex": r"XSegmentation fault",
