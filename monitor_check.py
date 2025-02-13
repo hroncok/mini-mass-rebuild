@@ -226,7 +226,11 @@ async def is_blue(session, url, http_semaphore):
     except aiohttp.client_exceptions.ClientPayloadError:
         logger.debug('broken content %s', url)
         return False
-    return 'but none of the providers can be installed' in content
+    # there can be multiple ways to state a missing dep
+    return (
+        "but none of the providers can be installed" in content
+        or "cannot install the best candidate for the job" in content
+    )
 
 
 async def is_repo_404(session, url, http_semaphore):
