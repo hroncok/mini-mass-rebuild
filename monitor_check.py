@@ -28,7 +28,8 @@ PACKAGE = re.compile(fr'<a href="/coprs/{COPR_STR_G}/package/([^/]+)/">')
 BUILD = re.compile(fr'<a href="/coprs/{COPR_STR_G}/build/([^/]+)/">')
 RESULT = re.compile(r'<span class="build-([^"]+)"')
 RPM_FILE = "<td class='t'>RPM File</td>"
-TAG = 'f42'
+TAG = 'f43'
+KOSCHEI = f"https://koschei.fedoraproject.org/api/v1/packages?name={{package}}&collection={TAG}"
 # copr bug: build.log isn't properly populated
 # TODO: rework to use builder-live.log.gz or wait for https://github.com/fedora-copr/copr/issues/2961
 LIMIT = 30
@@ -48,6 +49,7 @@ EXPLANATION = {
     'green': 'retired',
     'cyan': 'excluded from bug filing',
     'magenta': 'copr timeout or repo 404',
+    'white': 'FTBFS in both Copr and Koschei',
 }
 
 # FTBS packages for which we don't open bugs (yet)
@@ -231,6 +233,16 @@ async def is_blue(session, url, http_semaphore):
         "but none of the providers can be installed" in content
         or "cannot install the best candidate for the job" in content
     )
+
+
+async def is_white(session, package, http_semaphore):
+    url = KOSCHEI.format(package=package)
+    try:
+        content = await fetch(session, url, http_semaphore, json=True)
+    except aiohttp.client_exceptions.ClientPayloadError:
+        logger.debug('broken content %s', url)
+        return False
+    return content[0]['state'] == "failing"
 
 
 async def is_repo_404(session, url, http_semaphore):
@@ -544,6 +556,11 @@ async def process(
             message += ' (copr timeout)'
             fg = 'magenta'
 
+    if fg == 'red':
+        if await is_white(session, package, http_semaphore):
+            message += ' (last build failed in Koschei)'
+            fg = 'white'
+
     if critpath:
         message += ' \N{FIRE}'
     p(message, fg=fg)
@@ -554,6 +571,7 @@ async def process(
         and (longlog)
         and (str(package) not in EXCLUDE)
         and (fg != 'magenta')
+        and (fg != 'white')
     ):
         if not await failed_but_built(session, index_link(package, build), http_semaphore):
             reason = await guess_reason(session, builderlive_link(package, build), http_semaphore)
@@ -616,7 +634,6 @@ async def open_bz(package, build, status, browser_lock, reason=None):
         webbrowser.open(url_prefix + urlencode(params))
         # open the build logs next to bz template, so it's easier to identify issues
         webbrowser.open(builderlive_link(package, build))
-        webbrowser.open(f'https://koschei.fedoraproject.org/package/{package}')
         await asyncio.sleep(1)
 
 
