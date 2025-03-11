@@ -143,6 +143,11 @@ REASONS = {
         "long_description": """ DO NOT REPORT THIS """,
         "short_description": """ DO NOT REPORT THIS """,
     },
+    "h5py_import_error": {
+        "regex": r"ValueError: chr() arg not in range(0x110000)",
+        "long_description": """ DO NOT REPORT THIS """,
+        "short_description": """ DO NOT REPORT THIS """,
+    },
 }
 
 logger = logging.getLogger('monitor_check')
