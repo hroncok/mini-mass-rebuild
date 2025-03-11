@@ -36,7 +36,7 @@ LIMIT = 30
 BUGZILLA = 'bugzilla.redhat.com'
 BZ_PAGE_SIZE = 20
 TRACKER = 2322407  # PYTHON3.14
-RAWHIDE = 2300528  # F42FTBFS
+RAWHIDE = 2339432  # F43FTBFS
 LOGLEVEL = logging.WARNING
 
 DNF_CACHEDIR = '_dnf_cache_dir'
@@ -622,7 +622,7 @@ async def open_bz(package, build, status, browser_lock, reason=None):
         'short_desc': summary,
         'comment': description,
         'component': str(package),
-        'blocked': TRACKER,
+        'blocked': f"{TRACKER},{RAWHIDE}",
         'product': 'Fedora',
         'version': 'rawhide',
         #'bug_severity': 'high',
