@@ -4,7 +4,7 @@ import bugzilla
 import logging
 import re
 import sys
-from urllib.parse import urlencode, quote, unquote
+from urllib.parse import urlencode
 from textwrap import dedent
 import webbrowser
 
