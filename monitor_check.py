@@ -497,7 +497,7 @@ def p(*args, **kwargs):
 async def process(
     session, bugs, package, build, status, http_semaphore, command_semaphore, critpath_pkgs,
     *, browser_lock=None, with_reason=None, blues_file=None, magentas_file=None,
-    greens_file=None
+    greens_file=None, dependency_tree=False,
 ):
     if status != 'failed':
         return
@@ -552,8 +552,8 @@ async def process(
                 fg = 'red'
             else:
                 fg = 'blue'
-    if fg == 'yellow' or fg == 'blue':
-        await guess_missing_dependency(session, package, build, http_semaphore,
+    if (fg == 'yellow' or fg == 'blue') and dependency_tree:
+            await guess_missing_dependency(session, package, build, http_semaphore,
                                       fg, bugs)
 
     if fg == 'red':
@@ -698,7 +698,7 @@ async def main(pkgs=None, open_bug_reports=False, with_reason=False, blues_file=
                     http_semaphore, command_semaphore, critpath_pkgs,
                     browser_lock=browser_lock, with_reason=with_reason,
                     blues_file=blues_file, magentas_file=magentas_file,
-                    greens_file=greens_file
+                    greens_file=greens_file, dependency_tree=dependency_tree,
                 )))
             except TypeError:
                 pass
