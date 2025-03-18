@@ -627,7 +627,7 @@ async def open_bz(package, build, status, browser_lock, reason=None):
         'short_desc': summary,
         'comment': description,
         'component': str(package),
-        'blocked': f"{TRACKER},{RAWHIDE}",
+        'blocked': f"{TRACKER}",
         'product': 'Fedora',
         'version': 'rawhide',
         #'bug_severity': 'high',
