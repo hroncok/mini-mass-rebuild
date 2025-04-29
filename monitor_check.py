@@ -148,6 +148,14 @@ REASONS = {
         "long_description": """ DO NOT REPORT THIS """,
         "short_description": """ DO NOT REPORT THIS """,
     },
+    "exit_in_finally": {
+        "regex": r"SyntaxWarning: '(return|break|continue)' in a 'finally' block",
+        "long_description": """
+        PEP 765: Disallow return/break/continue that exit a finally block
+        The compiler emits a SyntaxWarning when a return, break or continue statements appears where it exits a finally block.
+        This change is specified in PEP 765: https://peps.python.org/pep-0765/. """,
+        "short_description": "",
+    },
 }
 
 logger = logging.getLogger('monitor_check')
