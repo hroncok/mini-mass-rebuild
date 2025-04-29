@@ -255,7 +255,9 @@ async def is_white(session, package, http_semaphore):
     except aiohttp.client_exceptions.ClientPayloadError:
         logger.debug('broken content %s', url)
         return False
-    return content[0]['state'] == "failing"
+    if content:
+        return content[0]['state'] == "failing"
+    return False
 
 
 async def is_repo_404(session, url, http_semaphore):
