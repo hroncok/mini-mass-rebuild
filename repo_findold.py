@@ -1,8 +1,8 @@
 import subprocess
 import rpm
 
-MAIN = 'f41'
-SIDE = 'f41-python'
+MAIN = 'f43'
+SIDE = 'f43-python'
 
 SIGNS = {
     1: '>',
