@@ -6,8 +6,8 @@ from collections import defaultdict
 
 TARGETVER = int(sys.argv[1]) if len(sys.argv) == 2 else None
 RAWHIDEVER = 43
-SUPPORTED_UPGRADE_VERS = (40, )
-OBSOLETE_PYTHON_VER = '3.12'
+SUPPORTED_UPGRADE_VERS = (41, 42)
+OBSOLETE_PYTHON_VER = '3.13'
 
 DNF_CACHEDIR = '_dnf_cache_dir'
 ARCH = 'x86_64'
