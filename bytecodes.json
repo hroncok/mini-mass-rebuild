@@ -3814,9 +3814,7 @@
         "zeitgeist",
         "zezere",
         "zinnia",
-        "znc"
-    ],
-    "inspection": [
+        "znc",
         "Cython",
         "conda",
         "freecell-solver",
@@ -3835,6 +3833,8 @@
         "python-rq",
         "python-sentry-sdk",
         "python-tqdm"
+    ],
+    "inspection": [
     ],
     "torebuild": [
         "COPASI",
