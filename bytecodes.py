@@ -2,8 +2,8 @@ import json
 import subprocess
 from click import progressbar
 
-repoquery = 'repoquery --repo=koji --refresh -f *.cpython-311.pyc --source'.split()
-py38_pkgs = subprocess.run(repoquery, stdout=subprocess.PIPE, text=True).stdout.splitlines()
+repoquery = 'repoquery --repo=koji --refresh -f *.cpython-314.pyc --source'.split()
+py314_pkgs = subprocess.run(repoquery, stdout=subprocess.PIPE, text=True).stdout.splitlines()
 
 try:
     with open('bytecodes.json', 'r') as f:
@@ -26,15 +26,15 @@ def isf(item):
 
 
 try:
-    with progressbar(py38_pkgs, item_show_func=isf) as bar:
+    with progressbar(py314_pkgs, item_show_func=isf) as bar:
         for pkg in bar:
             nevr = '.'.join(pkg.split('.')[:-2])
             name = '-'.join(nevr.split('-')[:-2])
             if name in processed:
                 continue
-            if nevr not in after(name, '2022-07-12 23:59:59'):
-                # https://koji.fedoraproject.org/koji/buildinfo?buildID=2000384
-                if nevr not in after(name, '2022-07-12 13:46:16'):
+            if nevr not in after(name, '2025-06-18 23:59:59'):
+                # https://koji.fedoraproject.org/koji/buildinfo?buildID=2733872
+                if nevr not in after(name, '2025-06-18 13:22:48'):
                     torebuild.add(name)
                 else:
                     inspection.add(name)
@@ -45,9 +45,9 @@ except KeyboardInterrupt:
     print('Interrupted.\n')
 
 print(f'Processed {len(processed)} packages.\n')
-print(f'{len(done)} packages were build with b4+')
-print(f'{len(inspection)} packages were built on 2022-07-12 and need manual inspection')
-print(f'{len(torebuild)} packages need to be rebuilt with b4+')
+print(f'{len(done)} packages were build with b3+')
+print(f'{len(inspection)} packages were built on 2025-06-18 and need manual inspection')
+print(f'{len(torebuild)} packages need to be rebuilt with b3+')
 
 with open('bytecodes.json', 'w') as f:
     json.dump({'done': sorted(done),
