@@ -3764,9 +3764,7 @@
         "zeitgeist",
         "zezere",
         "zinnia",
-        "znc"
-    ],
-    "inspection": [
+        "znc",
         "COPASI",
         "amdsmi",
         "bids-schema",
@@ -3777,6 +3775,8 @@
         "python-mkapi",
         "python-towncrier",
         "qr-code-generator"
+    ],
+    "inspection": [
     ],
     "torebuild": [
         "389-ds-base",
