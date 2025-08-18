@@ -44,7 +44,8 @@ try:
             if nevr not in after(name, '2025-08-15 23:59:59'):
                 # https://koji.fedoraproject.org/koji/buildinfo?buildID=2791425
                 # https://bodhi.fedoraproject.org/updates/FEDORA-2025-2fe07c73d5
-                if nevr not in after(name, '2025-08-15 12:47:23'):
+                # https://bodhi.fedoraproject.org/overrides/python3.14-3.14.0~rc2-1.fc43
+                if nevr not in after(name, '2025-08-15 12:39:34'):
                     torebuild.add(name)
                 elif built_by(nevr, 'churchyard'):
                     done.add(name)
