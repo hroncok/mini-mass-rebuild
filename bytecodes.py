@@ -58,9 +58,9 @@ except KeyboardInterrupt:
     print('Interrupted.\n')
 
 print(f'Processed {len(processed)} packages.\n')
-print(f'{len(done)} packages were build with b3+')
+print(f'{len(done)} packages were build with rc2+')
 print(f'{len(inspection)} packages were built on 2025-06-18 and need manual inspection')
-print(f'{len(torebuild)} packages need to be rebuilt with b3+')
+print(f'{len(torebuild)} packages need to be rebuilt with rc2+')
 
 with open('bytecodes.json', 'w') as f:
     json.dump({'done': sorted(done),
