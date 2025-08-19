@@ -26,6 +26,7 @@
         "cockpit",
         "createrepo_c",
         "criu",
+        "crypto-policies",
         "dblatex",
         "dbus-python",
         "dnf",
@@ -245,6 +246,7 @@
         "python-tornado",
         "python-tpm2-pytss",
         "python-trove-classifiers",
+        "python-typing-extensions",
         "python-typogrify",
         "python-urllib-gssapi",
         "python-urllib3",
@@ -257,6 +259,7 @@
         "python3.14",
         "pyusb",
         "pyxdg",
+        "qemu-kvm",
         "rdma-core",
         "realtime-tests",
         "rpm",
@@ -294,7 +297,6 @@
     "torebuild": [
         "babeltrace",
         "ceph",
-        "crypto-policies",
         "dnsconfd",
         "dogtag-pki",
         "gcc",
@@ -306,9 +308,7 @@
         "python-augeas",
         "python-dasbus",
         "python-markdown",
-        "python-typing-extensions",
         "python-websockets",
-        "qemu-kvm",
         "rpmdevtools",
         "sssd"
     ]
