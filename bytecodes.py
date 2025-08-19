@@ -1,9 +1,11 @@
 import json
+import pathlib
 import subprocess
 from click import progressbar
 
-repoquery = 'repoquery --repo=koji43 --refresh -f *.cpython-314.pyc --source'.split()
+repoquery = 'repoquery --repo=kojieln --refresh -f *.cpython-314.pyc --source'.split()
 py314_pkgs = subprocess.run(repoquery, stdout=subprocess.PIPE, text=True).stdout.splitlines()
+elns = pathlib.Path('view-all-source-package-name-list--view-eln.txt').read_text().splitlines()
 
 try:
     with open('bytecodes.json', 'r') as f:
@@ -39,6 +41,8 @@ try:
         for pkg in bar:
             nevr = '.'.join(pkg.split('.')[:-2])
             name = '-'.join(nevr.split('-')[:-2])
+            if name not in elns:
+                continue
             if name in processed:
                 continue
             if nevr not in after(name, '2025-08-15 23:59:59'):
@@ -47,8 +51,6 @@ try:
                 # https://bodhi.fedoraproject.org/overrides/python3.14-3.14.0~rc2-1.fc43
                 if nevr not in after(name, '2025-08-15 12:39:34'):
                     torebuild.add(name)
-                elif built_by(nevr, 'churchyard'):
-                    done.add(name)
                 else:
                     inspection.add(name)
             else:
