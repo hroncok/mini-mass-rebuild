@@ -252,6 +252,7 @@
         "python-urllib3",
         "python-virt-firmware",
         "python-wcwidth",
+        "python-websockets",
         "python-wheel",
         "python-xkbregistry",
         "python-yubico",
@@ -308,7 +309,6 @@
         "python-augeas",
         "python-dasbus",
         "python-markdown",
-        "python-websockets",
         "rpmdevtools",
         "sssd"
     ]
