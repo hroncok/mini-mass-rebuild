@@ -137,6 +137,7 @@
         "python-configshell",
         "python-crypt-r",
         "python-cryptography",
+        "python-dasbus",
         "python-dateutil",
         "python-dbus-client-gen",
         "python-dbus-python-client-gen",
@@ -307,7 +308,6 @@
         "osbuild",
         "pybind11",
         "python-augeas",
-        "python-dasbus",
         "python-markdown",
         "rpmdevtools",
         "sssd"
