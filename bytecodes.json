@@ -265,6 +265,7 @@
         "rdma-core",
         "realtime-tests",
         "rpm",
+        "rpmdevtools",
         "rteval",
         "samba",
         "scapy",
@@ -276,6 +277,7 @@
         "snapm",
         "sos",
         "speech-dispatcher",
+        "sssd",
         "stratis-cli",
         "subscription-manager",
         "subversion",
@@ -308,8 +310,6 @@
         "osbuild",
         "pybind11",
         "python-augeas",
-        "python-markdown",
-        "rpmdevtools",
-        "sssd"
+        "python-markdown"
     ]
 }
