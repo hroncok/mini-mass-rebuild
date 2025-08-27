@@ -37,6 +37,7 @@
         "fence-agents",
         "file",
         "firewalld",
+        "flashrom",
         "fonttools",
         "gcc",
         "gdb",
@@ -79,6 +80,7 @@
         "libmodulemd",
         "libnbd",
         "libnvme",
+        "libpfm",
         "librepo",
         "libsecret",
         "libselinux",
@@ -109,6 +111,7 @@
         "nvmetcli",
         "openscap",
         "openwsman",
+        "osbuild",
         "pacemaker",
         "pcp",
         "pcs",
@@ -306,9 +309,7 @@
         "ceph",
         "dnsconfd",
         "libgexiv2",
-        "libpfm",
         "orca",
-        "osbuild",
         "python-augeas",
         "python-markdown"
     ]
