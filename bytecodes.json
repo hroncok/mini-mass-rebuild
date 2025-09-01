@@ -14,6 +14,7 @@
         "audit",
         "awscli2",
         "babel",
+        "babeltrace",
         "bcc",
         "blueprint-compiler",
         "boom-boot",
@@ -32,6 +33,7 @@
         "dnf",
         "dnf-plugins-core",
         "dnf5",
+        "dnsconfd",
         "dogtag-pki",
         "dtc",
         "fence-agents",
@@ -187,6 +189,7 @@
         "python-linux-procfs",
         "python-lxml",
         "python-mako",
+        "python-markdown",
         "python-markupsafe",
         "python-meh",
         "python-meson-python",
@@ -305,12 +308,9 @@
     ],
     "inspection": [],
     "torebuild": [
-        "babeltrace",
         "ceph",
-        "dnsconfd",
         "libgexiv2",
         "orca",
-        "python-augeas",
-        "python-markdown"
+        "python-augeas"
     ]
 }
