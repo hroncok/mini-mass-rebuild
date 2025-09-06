@@ -75,6 +75,7 @@
         "libcomps",
         "libcpuid",
         "libdnf",
+        "libgexiv2",
         "libgpiod",
         "libguestfs",
         "liblc3",
@@ -113,6 +114,7 @@
         "nvmetcli",
         "openscap",
         "openwsman",
+        "orca",
         "osbuild",
         "pacemaker",
         "pcp",
@@ -309,8 +311,6 @@
     "inspection": [],
     "torebuild": [
         "ceph",
-        "libgexiv2",
-        "orca",
         "python-augeas"
     ]
 }
